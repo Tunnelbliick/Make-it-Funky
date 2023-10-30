@@ -1,0 +1,20 @@
+﻿FormatVersion: 7
+BeatmapId: 0
+BeatmapName: "ads"
+Assemblies:
+  - "projects\\___\\AForge.dll"
+  - "projects\\___\\AForge.Imaging.dll"
+Layers:
+  - "10e9d13d48a14b6db216ef20c693a930"
+  - "d0d0045421804d6c95894282f6aebe77"
+  - "8a39904e70a8497eaccad0d7dbb76823"
+  - "5a292d861b8542a39ca43fa5878af897"
+  - "2e86ee950b1444fcb0d9435702dfb9ff"
+  - "5c0c2468c41a48beb7ab23800e5bf31d"
+  - "768c630807cf486ab34080589497241b"
+  - "5f8523712dfb45da8b7bad157613f844"
+  - "83287204abce40d8a82785ebfa3e4727"
+  - "731eb8a22aee41b5816ce9f1d9a1c0b7"
+  - "5243f3ecb7f741ad8468fe7fec7dcba5"
+  - "d0db5df4d20b4085852144f08329ba46"
+  - "c7def0be1e384b3fb4fc23b5e6861115"
