@@ -424,8 +424,7 @@ namespace StorybrewScripts
                         field.RotatePlayField(59312, 100, OsbEasing.OutCirc, Math.PI / 16, 20, CenterType.receptor);
                         field.RotatePlayField(59510, 100, OsbEasing.OutCirc, -Math.PI / 16, 20, CenterType.receptor);
                         field.RotatePlayField(59613, 100, OsbEasing.OutCirc, Math.PI / 16, 20, CenterType.receptor);
-                        field.RotatePlayField(59716, 100, OsbEasing.OutCirc, -Math.PI / 16, 20, CenterType.receptor);
-                        field.RotatePlayField(59828, 100, OsbEasing.OutCirc, Math.PI / 32, 20, CenterType.receptor);
+                        field.RotatePlayField(59716, 100, OsbEasing.OutCirc, -Math.PI / 32, 20, CenterType.receptor);
 
                         field.RotatePlayFieldStatic(60024, 60230 - 60024, OsbEasing.None, Math.PI * 2);
 

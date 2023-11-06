@@ -17,6 +17,7 @@ namespace StorybrewScripts
     {
 
         Playfield field;
+        StoryboardLayer back;
 
         double phase = 0;
         private double lastPhaseX = 0; // To keep track of last phase value for X (Cosine)
@@ -27,7 +28,7 @@ namespace StorybrewScripts
 
             var receptors = GetLayer("r");
             var notes = GetLayer("n");
-            var back = GetLayer("b");
+            back = GetLayer("b");
 
             // General values
             var starttime = 79000;
@@ -53,25 +54,40 @@ namespace StorybrewScripts
             var recepotrBitmap = GetMapsetBitmap("sb/sprites/receiver.png"); // The receptor sprite
             var receportWidth = recepotrBitmap.Width;
 
+            var leftCover2 = back.CreateSprite("sb/white.png", OsbOrigin.CentreRight, new Vector2(0, 240));
+            var rightCover2 = back.CreateSprite("sb/white.png", OsbOrigin.CentreLeft, new Vector2(800, 240));
             var leftCover = back.CreateSprite("sb/white.png", OsbOrigin.CentreRight, new Vector2(0, 240));
             var rightCover = back.CreateSprite("sb/white.png", OsbOrigin.CentreLeft, new Vector2(800, 240));
 
-            leftCover.Color(starttime, new Color4(0, 0, 0, 0));
-            rightCover.Color(starttime, new Color4(0, 0, 0, 0));
+            leftCover.Color(starttime, new Color4(53, 74, 94, 255));
+            rightCover.Color(starttime, new Color4(53, 74, 94, 255));
+            leftCover2.Color(starttime, new Color4(23, 34, 43, 255));
+            rightCover2.Color(starttime, new Color4(23, 34, 43, 255));
 
             leftCover.ScaleVec(starttime, 854 / 2, 480f);
             rightCover.ScaleVec(starttime, 854 / 2, 480f);
+            leftCover2.ScaleVec(starttime, 854 / 2, 480f);
+            rightCover2.ScaleVec(starttime, 854 / 2, 480f);
 
             leftCover.Fade(renderStart, 1);
-            leftCover.Fade(81188, 0);
+            leftCover.Fade(79956, 0);
+
+            leftCover2.Fade(renderStart, 1);
+            leftCover2.Fade(79956, 0);
 
             rightCover.Fade(renderStart, 1);
-            rightCover.Fade(81188, 0);
+            rightCover.Fade(79956, 0);
+
+            rightCover2.Fade(renderStart, 1);
+            rightCover2.Fade(79956, 0);
 
             double closeDuration = 350;
 
-            leftCover.MoveX(OsbEasing.OutCirc, renderStart, renderStart + closeDuration, 0, 320);
-            rightCover.MoveX(OsbEasing.OutCirc, renderStart, renderStart + closeDuration, 800, 320);
+            leftCover.MoveX(OsbEasing.OutCirc, renderStart, renderStart + closeDuration, -110, 320);
+            rightCover.MoveX(OsbEasing.OutCirc, renderStart, renderStart + closeDuration, 750, 320);
+
+            leftCover2.MoveX(OsbEasing.OutCirc, renderStart - 10, renderStart + closeDuration - 10, -110, 320);
+            rightCover2.MoveX(OsbEasing.OutCirc, renderStart - 10, renderStart + closeDuration - 10, 750, 320);
 
             field = new Playfield();
             field.initilizePlayField(receptors, notes, starttime, endtime, receportWidth, 60, 0);
@@ -206,7 +222,7 @@ namespace StorybrewScripts
             draw.setHoldRotationPrecision(0f);
             draw.setHoldMovementPrecision(1.5f);
             draw.setNoteRotationPrecision(0f);
-            draw.drawViaEquation(duration, NoteFunction, true);
+            Log(draw.drawViaEquation(duration, NoteFunction, true));
         }
 
         public Vector2 NoteFunction(Vector2 currentPosition, double currentTime, double t)

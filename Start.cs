@@ -207,6 +207,8 @@ namespace StorybrewScripts
                 currentTime += localDuration;
             }
 
+            //ApplyYSineToPlayField(14202, 25709);
+
             field.RotatePlayFieldStatic(currentTime, localDuration, OsbEasing.OutSine, Math.PI * 2);
             field.moveField(currentTime, localDuration, OsbEasing.OutSine, movement, 0);
             currentTime += localDuration;
@@ -250,7 +252,7 @@ namespace StorybrewScripts
             draw.setNoteRotationPrecision(0f);
             draw.setNoteMovementPrecision(0f);
             draw.setHoldRotationPrecision(0f);
-            draw.drawViaEquation(duration, NoteFunction, true);
+            draw.drawViaEquation(duration - 200, NoteFunction, true);
 
         }
 
@@ -410,6 +412,30 @@ namespace StorybrewScripts
 
                 lastPhaseX += frequencyX;
                 lastPhaseY += frequencyX;
+                starttime += stepDuration;
+                count++;
+            }
+        }
+
+        public void ApplyYSineToPlayField(double starttime, double endtime)
+        {
+
+            int count = 1;
+            double stepDuration = 40;
+            double frequencyX = 0.1;
+            double frequencyY = 0.1;
+            double phase = 0;
+
+            while (starttime < endtime - stepDuration)
+            {
+                OsbEasing easing = OsbEasing.None;
+
+                // Using sine for y-axis with a phase difference to start at the top point
+                float y = (float)Utility.CosWaveValue(1, frequencyY, phase);
+
+                field.moveField(starttime, stepDuration, easing, 0, y);
+
+                phase += frequencyX;
                 starttime += stepDuration;
                 count++;
             }

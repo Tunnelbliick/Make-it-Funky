@@ -291,7 +291,7 @@ namespace StorybrewScripts
                         {
                             field.moveField(currentTime, 0, OsbEasing.OutCirc, 0, 15);
                             field.moveField(currentTime + snapDuration / 2, snapDuration / 2, OsbEasing.InSine, 0, -15);
-                            field.RotatePlayFieldStatic(currentTime, snapDuration / 2, OsbEasing.OutSine, -3.141592);
+                            field.RotatePlayFieldStatic(currentTime + 1, snapDuration / 2, OsbEasing.OutSine, -3.1415);
                         }
 
                         didHop = !didHop;
@@ -299,10 +299,11 @@ namespace StorybrewScripts
                     }
 
                     if (didHop)
-                    {   
+                    {
                         field.columns.Values.ToList().ForEach((col) => Log($"{i} - {col.type} - {col.getReceptorRotation(currentTime)}"));
-                        field.RotatePlayFieldStatic(currentTime, 0, OsbEasing.OutSine, -3.141592);
+                        field.RotatePlayFieldStatic(currentTime + 100, 100, OsbEasing.None, -Math.PI);
                     }
+
 
                     if (i == 1)
                     {

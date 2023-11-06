@@ -30,7 +30,7 @@ namespace StorybrewScripts
             // General values
             var starttime = 66800;
             var renderStart = 66805;
-            var endtime = 81100;
+            var endtime = 79956;
             var duration = endtime - renderStart;
 
             // Playfield Scale
@@ -53,51 +53,67 @@ namespace StorybrewScripts
             var receportWidth = recepotrBitmap.Width;
 
             var white = back.CreateSprite("sb/white.png");
-            white.Color(starttime, new Color4(255, 255, 255, 255));
+            white.Color(starttime, new Color4(53, 74, 94, 255));
             white.ScaleVec(starttime, 854, 480);
             white.Fade(starttime, 1);
             white.Fade(endtime, 0);
 
             var colored = back.CreateSprite("sb/white.png");
-            colored.Color(starttime, new Color4(255, 205, 0, 255));
+            colored.Color(starttime, new Color4(213, 84, 104, 255));
             colored.ScaleVec(starttime, new Vector2(0, 0));
             colored.Fade(starttime, 1);
             colored.Fade(endtime, 0);
 
             var cube = back.CreateSprite("sb/white.png", OsbOrigin.Centre);
-            cube.Color(starttime, new Color4(255, 255, 255, 255));
+            cube.Color(starttime, new Color4(53, 74, 94, 255));
             cube.ScaleVec(starttime, new Vector2(40, 40));
             cube.Fade(starttime, 1);
             cube.Fade(endtime, 0);
 
             var cube2 = back.CreateSprite("sb/white.png", OsbOrigin.CentreLeft, new Vector2(0, 0));
-            cube2.Color(starttime, new Color4(255, 255, 255, 255));
+            cube2.Color(starttime, new Color4(53, 74, 94, 255));
             cube2.ScaleVec(starttime, new Vector2(40, 40));
             cube2.Fade(starttime, 1);
             cube2.Fade(endtime, 0);
 
             var cube3 = back.CreateSprite("sb/white.png", OsbOrigin.CentreRight, new Vector2(0, 0));
-            cube3.Color(starttime, new Color4(255, 255, 255, 255));
+            cube3.Color(starttime, new Color4(53, 74, 94, 255));
             cube3.ScaleVec(starttime, new Vector2(40, 40));
             cube3.Fade(starttime, 1);
             cube3.Fade(endtime, 0);
 
             var cube4 = back.CreateSprite("sb/white.png", OsbOrigin.CentreRight, new Vector2(0, 0));
-            cube4.Color(starttime, new Color4(255, 255, 255, 255));
+            cube4.Color(starttime, new Color4(53, 74, 94, 255));
             cube4.ScaleVec(starttime, new Vector2(40, 40));
             cube4.Fade(starttime, 1);
             cube4.Fade(endtime, 0);
 
             var colored2 = back.CreateSprite("sb/white.png");
-            colored2.Color(starttime, new Color4(255, 205, 0, 255));
+            colored2.Color(starttime, new Color4(213, 84, 104, 255));
             colored2.ScaleVec(starttime, new Vector2(0, 0));
             colored2.Fade(starttime, 1);
             colored2.Fade(endtime, 0);
 
             var cover = back.CreateSprite("sb/cover.png");
-            cover.Scale(starttime, 1);
-            cover.Fade(starttime, 1);
+            cover.Scale(OsbEasing.OutCirc, 65161, starttime, 2, 1);
+            cover.Scale(OsbEasing.OutSine, 79545, 79956, 1, 1.5);
+            cover.Fade(65161, 1);
             cover.Fade(endtime, 0);
+            cover.Color(65161, new Color4(228, 228, 228, 255));
+            cover.Color(OsbEasing.InOutCirc, starttime, 68449, new Color4(53, 74, 94, 255), new Color4(0, 148, 174, 255));
+            cover.Color(OsbEasing.InOutCirc, 69887, 70093, new Color4(0, 148, 174, 255), new Color4(224, 187, 47, 255));
+            cover.Color(OsbEasing.InOutCirc, 70093, 71736, new Color4(224, 187, 47, 255), new Color4(255, 255, 255, 255));
+            cover.Color(OsbEasing.InOutCirc, 72558, 73380, new Color4(255, 255, 255, 255), new Color4(53, 74, 94, 255));
+            cover.Color(OsbEasing.InOutCirc, 73380, 75024, new Color4(53, 74, 94, 255), new Color4(213, 84, 104, 255));
+            cover.Color(OsbEasing.InOutCirc, 75846, 76668, new Color4(213, 84, 104, 255), new Color4(255, 255, 255, 255));
+            cover.Color(OsbEasing.InOutCirc, 78312, 79134, new Color4(255, 255, 255, 255), new Color4(53, 74, 94, 255));
+
+            var cover2 = back.CreateSprite("sb/cover.png");
+            cover2.Scale(OsbEasing.OutCirc, 65161, starttime, 2, 1);
+            cover2.Fade(65161, 0.35);
+            cover2.Fade(endtime, 0);
+            cover2.Scale(OsbEasing.OutSine, 79545, 79956, 1, 1.5);
+            cover2.Color(starttime, new Color4(0, 0, 0, 0));
 
             colored.ScaleVec(OsbEasing.OutCirc, 66805, 67421, new Vector2(0, 2), new Vector2(500, 2));
             colored.Rotate(OsbEasing.OutSine, 66805, 68449, -Math.PI / 32, -Math.PI);
@@ -172,9 +188,9 @@ namespace StorybrewScripts
             ApplySineToPlayField(starttime, endtime);
 
             DrawInstance draw2 = new DrawInstance(field2, renderStart, scrollSpeed, updatesPerSecond, OsbEasing.None, rotateNotesToFaceReceptor, fadeTime, fadeOutTime);
-            draw2.SetColor(new Color4(255, 255, 255, 255));
+            draw2.SetColor(new Color4(53, 74, 94, 255));
             DrawInstance draw = new DrawInstance(field, renderStart, scrollSpeed, updatesPerSecond, OsbEasing.None, rotateNotesToFaceReceptor, fadeTime, fadeOutTime);
-            draw.SetColor(new Color4(255, 205, 0, 255));
+            draw.SetColor(new Color4(213, 84, 104, 255));
             // All effekts have to be executed before calling the draw Function.
             // Anything that is done after the draw Function call will not be rendered out.
             draw.setHoldRotationPrecision(0f);

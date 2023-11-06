@@ -228,9 +228,9 @@ namespace StorybrewScripts
 
                         SliderMovement.Add(sliderCurrentTime, currentSliderPositon, EasingFunctions.ToEasingFunction(easing));
                         SliderScale.Add(sliderCurrentTime, newScale, EasingFunctions.ToEasingFunction(easing));
-                        SliderRotation.Add(sliderCurrentTime, sliderRotation, EasingFunctions.ToEasingFunction(easing));
 
                         bool hasStartedRendering = false;
+                        double prevTheta = 0;  // You need to store the previous theta between calls
 
                         do
                         {
@@ -249,9 +249,13 @@ namespace StorybrewScripts
 
                             double timeleft = sliderStartime - sliderCurrentTime;
                             sliderProgress = Math.Min((float)(sliderIteratedTime / easetime), 1);
+                            float sliderProgressNext = Math.Min((float)((sliderIteratedTime + sliderIterationLenght) / easetime), 1);
+
+                            debug += sliderProgressNext;
 
                             // Apply easing to the progress
                             float easedProgress = (float)easing.Ease(sliderProgress);
+                            float easedNextProgress = (float)easing.Ease(sliderProgressNext);
 
                             if (currentEffect.Value != null && currentEffect.Value.effektType == EffectType.RenderPlayFieldFrom)
                             {
@@ -291,13 +295,35 @@ namespace StorybrewScripts
                             Vector2 originPosition = column.origin.getCurrentPosition(sliderCurrentTime + sliderIterationLenght);
                             Vector2 receptorPosition = column.receptor.getCurrentPosition(sliderCurrentTime + sliderIterationLenght);
                             Vector2 newPosition = Vector2.Lerp(originPosition, receptorPosition, easedProgress);
-                            newPosition = equation(newPosition, sliderCurrentTime + sliderIterationLenght, easedProgress);
+                            Vector2 nextPosition = Vector2.Lerp(originPosition, receptorPosition, easedNextProgress);
+                            newPosition = equation(newPosition, sliderCurrentTime, easedProgress);
+                            nextPosition = equation(nextPosition, sliderCurrentTime, easedNextProgress);
                             Vector2 receptorScale = column.receptor.getCurrentScale(sliderCurrentTime + sliderIterationLenght);
                             Vector2 renderedReceptorPosition = column.receptor.renderedSprite.PositionAt(sliderCurrentTime);
 
                             double theta = 0;
-                            Vector2 delta = newPosition - currentSliderPositon;
-                            theta = Math.Atan2(delta.X, delta.Y);
+
+                            // ... (your existing code)
+
+                            // Calculate the current theta
+                            Vector2 delta = new Vector2(nextPosition.X - newPosition.X, nextPosition.Y - newPosition.Y);
+                            double newTheta = Math.Atan2(delta.X, delta.Y);
+
+                            // Check if the difference between the new theta and the previous theta exceeds 180°
+                            double difference = newTheta - prevTheta;
+                            if (difference > Math.PI)
+                            {
+                                newTheta -= 2 * Math.PI;
+                            }
+                            else if (difference < -Math.PI)
+                            {
+                                newTheta += 2 * Math.PI;
+                            }
+
+                            theta = newTheta;
+                            prevTheta = newTheta;
+
+
 
                             // If the note is already done
                             if (sliderCurrentTime > note.starttime)
@@ -313,7 +339,7 @@ namespace StorybrewScripts
 
                             SliderMovement.Add(sliderCurrentTime + sliderIterationLenght, newPosition);
                             SliderScale.Add(sliderCurrentTime + sliderIterationLenght, newScale);
-                            SliderRotation.Add(sliderCurrentTime + sliderIterationLenght, sliderRotation - theta);
+                            SliderRotation.Add(sliderCurrentTime + sliderIterationLenght, -theta);
 
                             sliderIteratedTime += sliderIterationLenght;
                             sliderCurrentTime += sliderIterationLenght;
@@ -327,7 +353,7 @@ namespace StorybrewScripts
                         SliderRotation.Simplify1dKeyframes(instance.HoldRotationPrecision, v => (float)v);
                         SliderMovement.ForEachPair((start, end) => sprite.Move(OsbEasing.None, start.Time, end.Time, start.Value, end.Value));
                         SliderScale.ForEachPair((start, end) => sprite.ScaleVec(start.Time, end.Time, start.Value.X, start.Value.Y, end.Value.X, end.Value.Y));
-                        SliderRotation.ForEachPair((start, end) => sprite.Rotate(OsbEasing.None, start.Time, end.Time - start.Time, start.Value, end.Value));
+                        SliderRotation.ForEachPair((start, end) => sprite.Rotate(OsbEasing.None, start.Time, end.Time, start.Value, end.Value));
                     }
 
 
