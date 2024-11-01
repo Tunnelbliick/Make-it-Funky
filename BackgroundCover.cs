@@ -1882,7 +1882,7 @@ namespace StorybrewScripts
             sphere2.Fade(84887, 1);
             sphere2.Fade(85504, 0);
 
-            var cube5 = GetLayer("").CreateSprite("sb/cube.png", OsbOrigin.CentreRight, new Vector2(272.5f, 68));
+            /*var cube5 = GetLayer("").CreateSprite("sb/cube.png", OsbOrigin.CentreRight, new Vector2(272.5f, 68));
             cube5.ScaleVec(85709, new Vector2(0.07f, 0.07f));
             cube5.MoveX(OsbEasing.OutCirc, 85709, 85709 + 50, cube5.PositionAt(85709).X, cube5.PositionAt(85709).X - 50);
             cube5.MoveX(OsbEasing.OutCirc, 85812, 85812 + 50, cube5.PositionAt(85812).X, cube5.PositionAt(85812).X - 50);
@@ -1892,7 +1892,7 @@ namespace StorybrewScripts
             cube5.ScaleVec(OsbEasing.OutCirc, 86428, 86634 - 50, new Vector2(0.07f, 0.07f), new Vector2(0f, 0.07f));
             cube5.MoveY(85709, 86736, 68, 105);
             cube5.Fade(85709, 1);
-            cube5.Fade(86736, 0);
+            cube5.Fade(86736, 0);*/
 
             var cube6 = GetLayer("").CreateSprite("sb/cube.png");
             cube6.ScaleVec(86531, new Vector2(0.075f, 0.075f));

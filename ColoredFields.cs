@@ -17,7 +17,6 @@ namespace StorybrewScripts
     {
         Playfield field;
         Playfield field2;
-
         double phase = 0;
 
         public override void Generate()
@@ -26,16 +25,17 @@ namespace StorybrewScripts
             var receptors = GetLayer("r");
             var notes = GetLayer("n");
             var back = GetLayer("b");
+            var front = GetLayer("f");
 
             // General values
             var starttime = 66800;
-            var renderStart = 66805;
+            var renderStart = 66810;
             var endtime = 79956;
             var duration = endtime - renderStart;
 
             // Playfield Scale
             var width = 250f;
-            var height = 440f;
+            var height = 350f;
 
             // Note initilization Values
             var bpm = 146f;
@@ -44,7 +44,18 @@ namespace StorybrewScripts
 
             // Drawinstance Values
             var updatesPerSecond = 30;
-            var scrollSpeed = 900f;
+            var scrollSpeed = 750f;
+
+            if (Beatmap.Name == "HARD MODE")
+            {
+                scrollSpeed = 600f;
+            }
+
+            if (Beatmap.Name == "EASY MODE")
+            {
+                scrollSpeed = 900f;
+            }
+
             var rotateNotesToFaceReceptor = false;
             var fadeTime = 100;
             var fadeOutTime = 40;
@@ -94,7 +105,7 @@ namespace StorybrewScripts
             colored2.Fade(starttime, 1);
             colored2.Fade(endtime, 0);
 
-            var cover = back.CreateSprite("sb/cover.png");
+            var cover = front.CreateSprite("sb/cover.png");
             cover.Scale(OsbEasing.OutCirc, 65161, starttime, 2, 1);
             cover.Scale(OsbEasing.OutSine, 79545, 79956, 1, 1.5);
             cover.Fade(65161, 1);
@@ -108,7 +119,7 @@ namespace StorybrewScripts
             cover.Color(OsbEasing.InOutCirc, 75846, 76668, new Color4(213, 84, 104, 255), new Color4(255, 255, 255, 255));
             cover.Color(OsbEasing.InOutCirc, 78312, 79134, new Color4(255, 255, 255, 255), new Color4(53, 74, 94, 255));
 
-            var cover2 = back.CreateSprite("sb/cover.png");
+            var cover2 = front.CreateSprite("sb/cover.png");
             cover2.Scale(OsbEasing.OutCirc, 65161, starttime, 2, 1);
             cover2.Fade(65161, 0.35);
             cover2.Fade(endtime, 0);
@@ -147,20 +158,24 @@ namespace StorybrewScripts
             colored2.ScaleVec(OsbEasing.InOutBounce, 79134, 79134 + 1000, new Vector2(0, 0), new Vector2(850, 850));
 
             field2 = new Playfield();
-            field2.initilizePlayField(receptors, notes, starttime, endtime, receportWidth, 60, 0);
-            field2.ScalePlayField(starttime, 0, OsbEasing.None, width, -height); // Its important that this gets executed AFTER the Playfield is initialized otherwise this will run into "overlapped commands" and break
-            field2.initializeNotes(Beatmap.HitObjects.ToList(), notes, bpm, offset, true, sliderAccuracy);
-            field2.ZoomAndMove(starttime + 1, 0, OsbEasing.None, new Vector2(0.45f, 0.45f), new Vector2(0, -20));
+            field2.initilizePlayField(receptors, notes, starttime, endtime, width, height, 60, Beatmap.OverallDifficulty);
+            // field2.ScalePlayField(starttime, 0, OsbEasing.None, width, -height); // Its important that this gets executed AFTER the Playfield is initialized otherwise this will run into "overlapped commands" and break
+            field2.initializeNotes(Beatmap.HitObjects.ToList(), bpm, offset, true, sliderAccuracy);
+            field2.Scale(OsbEasing.None, starttime, starttime, new Vector2(0.45f));
+            // field2.Sca(starttime + 1, 0, OsbEasing.None, new Vector2(0.45f, 0.45f), new Vector2(0, -20));
 
             field = new Playfield();
-            field.initilizePlayField(receptors, notes, starttime, endtime, receportWidth, 60, 0);
-            field.ScalePlayField(starttime, 0, OsbEasing.None, width, height); // Its important that this gets executed AFTER the Playfield is initialized otherwise this will run into "overlapped commands" and break
-            field.initializeNotes(Beatmap.HitObjects.ToList(), notes, bpm, offset, true, sliderAccuracy);
-            field.ZoomAndMove(starttime + 1, 0, OsbEasing.None, new Vector2(0.45f, 0.45f), new Vector2(0, 60));
+            field.initilizePlayField(receptors, notes, starttime, endtime, width, -height, 60, Beatmap.OverallDifficulty);
+            //field.ScalePlayField(starttime, 0, OsbEasing.None, width, height); // Its important that this gets executed AFTER the Playfield is initialized otherwise this will run into "overlapped commands" and break
+            field.initializeNotes(Beatmap.HitObjects.ToList(), bpm, offset, true, sliderAccuracy);
+            field.Scale(OsbEasing.None, starttime, starttime, new Vector2(0.45f));
+            // field.ZoomAndMove(starttime + 1, 0, OsbEasing.None, new Vector2(0.45f, 0.45f), new Vector2(0, 60));
 
             field.fadeAt(67863, 1);
 
             field.addEffectWithValue(67935, 70100, EffectType.RenderPlayFieldUntil, "0", 0);
+            field.fadeAt(68448, 0);
+            field.fadeAt(70092, 1);
             field.addEffectWithValue(70100, 73278, EffectType.RenderPlayFieldUntil, "1", 1);
             field.addEffectWithValue(73278, 75435, EffectType.RenderPlayFieldUntil, "2", 0);
             field.addEffectWithValue(75435, 79956, EffectType.RenderPlayFieldUntil, "3", 1);
@@ -171,17 +186,17 @@ namespace StorybrewScripts
 
             for (int i = 0; i < 5; i++)
             {
-                field.moveFieldX(currentTime, localDuration, OsbEasing.OutSine, movement);
-                field2.moveFieldX(currentTime, localDuration, OsbEasing.OutSine, -movement);
+                field.moveFieldX(OsbEasing.OutSine, currentTime, currentTime + localDuration, movement);
+                field2.moveFieldX(OsbEasing.OutSine, currentTime, currentTime + localDuration, -movement);
                 currentTime += localDuration;
-                field.moveFieldX(currentTime, localDuration, OsbEasing.InSine, -movement);
-                field2.moveFieldX(currentTime, localDuration, OsbEasing.InSine, movement);
+                field.moveFieldX(OsbEasing.InSine, currentTime, currentTime + localDuration, -movement);
+                field2.moveFieldX(OsbEasing.InSine, currentTime, currentTime + localDuration, movement);
                 currentTime += localDuration;
-                field.moveFieldX(currentTime, localDuration, OsbEasing.OutSine, -movement);
-                field2.moveFieldX(currentTime, localDuration, OsbEasing.OutSine, movement);
+                field.moveFieldX(OsbEasing.OutSine, currentTime, currentTime + localDuration, -movement);
+                field2.moveFieldX(OsbEasing.OutSine, currentTime, currentTime + localDuration, movement);
                 currentTime += localDuration;
-                field.moveFieldX(currentTime, localDuration, OsbEasing.InSine, movement);
-                field2.moveFieldX(currentTime, localDuration, OsbEasing.InSine, -movement);
+                field.moveFieldX(OsbEasing.InSine, currentTime, currentTime + localDuration, movement);
+                field2.moveFieldX(OsbEasing.InSine, currentTime, currentTime + localDuration, -movement);
                 currentTime += localDuration;
             }
 
@@ -200,23 +215,23 @@ namespace StorybrewScripts
 
         }
 
-        public Vector2 NotePathTop(Vector2 currentPosition, double currentTime, double t)
+        public Vector2 NotePathTop(EquationParameters param)
         {
-            float x = currentPosition.X;
-            float y = currentPosition.Y;
+            float x = param.position.X;
+            float y = param.position.Y;
 
-            x += (float)Utility.SineWaveValueWithPhase(38, 0.425, t, 0.5);
+            x += (float)Utility.SineWaveValueWithPhase(38, 0.425, param.progress, 0.5);
 
             return new Vector2(x, y);
         }
 
-        public Vector2 NotePathBottom(Vector2 currentPosition, double currentTime, double t)
+        public Vector2 NotePathBottom(EquationParameters param)
         {
 
-            float x = currentPosition.X;
-            float y = currentPosition.Y;
+            float x = param.position.X;
+            float y = param.position.Y;
 
-            x -= (float)Utility.SineWaveValueWithPhase(38, 0.425, t, 0.5);
+            x -= (float)Utility.SineWaveValueWithPhase(38, 0.425, param.progress, 0.5);
 
             return new Vector2(x, y);
         }
@@ -235,8 +250,8 @@ namespace StorybrewScripts
                 // Using sine for y-axis with a phase difference to start at the top point
                 float y = (float)Utility.CosWaveValue(0.4, frequencyY, phase);
 
-                field.moveField(starttime, stepDuration, easing, 0, y);
-                field2.moveField(starttime, stepDuration, easing, 0, y);
+                field.moveFieldY(easing, starttime, stepDuration, y);
+                field2.moveFieldY(easing, starttime, stepDuration, y);
 
                 phase += frequencyY;
                 starttime += stepDuration;

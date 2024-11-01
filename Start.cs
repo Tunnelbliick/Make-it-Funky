@@ -16,7 +16,6 @@ namespace StorybrewScripts
 {
     public class Start : StoryboardObjectGenerator
     {
-
         Playfield field;
 
         private double lastPhaseX = 0; // To keep track of last phase value for X (Cosine)
@@ -30,8 +29,8 @@ namespace StorybrewScripts
 
             // General values
             var starttime = -2500;
-            var endtime = 40606;
-            var duration = endtime - starttime;
+            var endtime = 41017;
+            var duration = endtime - starttime - 500;
 
             // Playfield Scale
             var width = 250f;
@@ -45,221 +44,276 @@ namespace StorybrewScripts
             // Drawinstance Values
             var updatesPerSecond = 100;
             var scrollSpeed = 900f;
+
+            if (Beatmap.Name == "HARD MODE")
+            {
+                scrollSpeed = 750f;
+            }
+
+            if (Beatmap.Name == "EASY MODE")
+            {
+                scrollSpeed = 1050f;
+            }
+
             var fadeTime = 50;
 
             var recepotrBitmap = GetMapsetBitmap("sb/sprites/receiver.png"); // The receptor sprite
             var receportWidth = recepotrBitmap.Width;
 
             Playfield field2 = new Playfield();
-            field2.initilizePlayField(receptors, notes, -591, 1052, receportWidth, 60, 0);
-            field2.noteEnd = 5000;
-            field2.initializeNotes(Beatmap.HitObjects.ToList(), notes, bpm, offset, false, sliderAccuracy);
-            field2.ScalePlayField(-591, 0, OsbEasing.None, width, 2500);
-            field2.moveField(-591 + 1, 0, OsbEasing.None, 0, -20);
-            field2.ZoomAndMove(-591 + 2, 50, OsbEasing.OutCirc, new Vector2(0.1f, .1f), new Vector2(0, -200));
+            field2.initilizePlayField(receptors, notes, -591, 1051, width, -2500, 0, Beatmap.OverallDifficulty);
+            field2.noteEnd = 8000;
+            field2.initializeNotes(Beatmap.HitObjects.ToList(), bpm, offset, false, sliderAccuracy);
+            field2.moveFieldY(OsbEasing.None, -590, -590, 850);
+            field2.Scale(OsbEasing.OutCirc, -590, -590, new Vector2(0.1f, .1f));
 
-            DrawInstance draw2 = new DrawInstance(field2, -489, 5000, 30, OsbEasing.None, false, 250, 0);
-            draw2.drawNotesByOriginToReceptor(1050 + 489, true);
+
+            DrawInstance draw2 = new DrawInstance(field2, -489, 8000, 30, OsbEasing.None, false, 250, 0);
+            draw2.setHoldRotationPrecision(0);
+            draw2.drawViaEquation(1051 + 489, NoteFunction2, true, false);
 
             field = new Playfield();
-            field.initilizePlayField(receptors, notes, starttime, endtime, receportWidth, 60, 0);
-            field.noteEnd = 43120;
-            field.initializeNotes(Beatmap.HitObjects.ToList(), notes, bpm, offset, false, sliderAccuracy);
-            field.ScalePlayField(starttime, 0, OsbEasing.None, width, height);
-            field.moveField(starttime + 1, 0, OsbEasing.None, 0, -20);
-            field.ZoomAndMove(starttime + 2, 0, OsbEasing.OutCirc, new Vector2(0.1f, 0.1f), new Vector2(0, 200));
-            field.ZoomAndMove(1052, 500, OsbEasing.OutCirc, new Vector2(1f, 1f), new Vector2(0, -850));
+            field.initilizePlayField(receptors, notes, starttime, endtime, width, -height, 50, Beatmap.OverallDifficulty);
+            field.noteEnd = 41736;
+            field.initializeNotes(Beatmap.HitObjects.ToList(), bpm, offset, false, sliderAccuracy);
+            field.Scale(OsbEasing.OutCirc, -785, 50, new Vector2(0.1f, 0.1f));
+            field.moveFieldY(OsbEasing.OutCirc, 1052, 1052 + 500, -150);
+            field.Scale(OsbEasing.OutCirc, 1052, 1052 + 500, new Vector2(0.7f, 0.7f));
 
             double currentTime = 1668;
             double interval = 100;
             double currentRotation = Math.PI / 16;
-            float currentScale = 1f;
+            float currentScale = field.columns[ColumnType.one].ReceptorScaleAt(currentTime).X;
 
             for (int i = 0; i < 5; i++)
             {
                 currentRotation *= -1;
-                currentScale -= 0.1f;
+                currentScale -= 0.05f;
                 double localRotation = currentRotation;
+
+                field.moveFieldY(OsbEasing.OutCirc, currentTime, currentTime + interval / 6, 30);
 
                 if (i > 0)
                 {
                     localRotation = currentRotation * 2;
                 }
-                field.RotatePlayField(currentTime, 0, OsbEasing.None, localRotation, 1);
-                field.ZoomAndMove(currentTime + 1, 0, OsbEasing.None, new Vector2(currentScale, currentScale), new Vector2(0, 50));
+                if (i < 5)
+                {
+                    field.Rotate(OsbEasing.OutCirc, currentTime, currentTime + interval / 6, localRotation);
+                }
+                field.Scale(OsbEasing.OutCirc, currentTime, currentTime, new Vector2(currentScale, currentScale));
                 currentTime += interval;
             }
 
-            field.RotatePlayField(currentTime, 0, OsbEasing.None, -currentRotation, 1);
-            field.PlayFieldChangeWidth(2695, 2901 - 2695, OsbEasing.OutCirc, 600);
-            field.PlayFieldChangeWidth(2901, 3309 - 2901, OsbEasing.OutCirc, 250);
-            field.PlayFieldChangeWidth(3309, 3517 - 3309, OsbEasing.OutCirc, 600);
-            field.PlayFieldChangeWidth(3517, 3928 - 3517, OsbEasing.OutSine, 250);
-
-            PlayFieldEffect columnSwap = new PlayFieldEffect(field, 4339, 4339 + 50, OsbEasing.InOutSine, 10);
-            columnSwap.SwapColumn(ColumnType.four, ColumnType.two);
-            PlayFieldEffect columnSwap2 = new PlayFieldEffect(field, 4750, 4750 + 50, OsbEasing.InOutSine, 10);
-            columnSwap2.SwapColumn(ColumnType.two, ColumnType.four);
-            PlayFieldEffect columnSwap3 = new PlayFieldEffect(field, 4956, 4956 + 50, OsbEasing.InOutSine, 10);
-            columnSwap3.SwapColumn(ColumnType.four, ColumnType.one);
-            PlayFieldEffect columnSwap4 = new PlayFieldEffect(field, 5161, 5161 + 50, OsbEasing.InOutSine, 10);
-            columnSwap4.SwapColumn(ColumnType.one, ColumnType.four);
-
-            field.MoveOriginRelative(6599, 50, OsbEasing.None, new Vector2(-100, 0), ColumnType.all);
-            field.MoveReceptorRelative(6599, 50, OsbEasing.None, new Vector2(100, 0), ColumnType.all);
-            field.MoveOriginRelative(6805, 250, OsbEasing.OutSine, new Vector2(100, 0), ColumnType.all);
-            field.MoveReceptorRelative(6805, 250, OsbEasing.OutSine, new Vector2(-100, 0), ColumnType.all);
-
-            field.RotatePlayFieldStatic(7421, 300, OsbEasing.None, Math.PI * 2);
-
-            field.PlayFieldChangeWidth(7216, 200, OsbEasing.OutCirc, 600);
-            field.PlayFieldChangeWidth(7421, 200, OsbEasing.OutCirc, 250);
-
-            field.MoveOriginRelative(8265, 0, OsbEasing.None, new Vector2(200, 0), ColumnType.all);
-            field.MoveReceptorRelative(8265, 0, OsbEasing.None, new Vector2(-200, 0), ColumnType.all);
-            field.MoveOriginRelative(8266, 250, OsbEasing.OutSine, new Vector2(-200, 0), ColumnType.all);
-            field.MoveReceptorRelative(8266, 250, OsbEasing.OutSine, new Vector2(200, 0), ColumnType.all);
-
-            field.MoveOriginRelative(8654, 0, OsbEasing.None, new Vector2(-100, 0), ColumnType.all);
-            field.MoveReceptorRelative(8654, 0, OsbEasing.None, new Vector2(100, 0), ColumnType.all);
-            field.MoveOriginRelative(8655, 150, OsbEasing.OutSine, new Vector2(100, 0), ColumnType.all);
-            field.MoveReceptorRelative(8655, 150, OsbEasing.OutSine, new Vector2(-100, 0), ColumnType.all);
-
-            field.MoveOriginRelative(8860, 0, OsbEasing.None, new Vector2(100, 0), ColumnType.all);
-            field.MoveReceptorRelative(8860, 0, OsbEasing.None, new Vector2(-100, 0), ColumnType.all);
-            field.MoveOriginRelative(8860, 150, OsbEasing.OutSine, new Vector2(-100, 0), ColumnType.all);
-            field.MoveReceptorRelative(8860, 150, OsbEasing.OutSine, new Vector2(100, 0), ColumnType.all);
-
-            field.RotatePlayFieldStatic(9065, 300, OsbEasing.None, Math.PI * 2);
+            // Reset playfield rotation
+            field.Rotate(OsbEasing.OutCirc, currentTime, currentTime + interval / 6, -currentRotation);
 
 
-            field.MoveOriginRelative(9887, 0, OsbEasing.None, new Vector2(200, 0), ColumnType.all);
-            field.MoveReceptorRelative(9887, 0, OsbEasing.None, new Vector2(-200, 0), ColumnType.all);
-            field.MoveOriginRelative(9887, 250, OsbEasing.OutSine, new Vector2(-200, 0), ColumnType.all);
-            field.MoveReceptorRelative(9887, 250, OsbEasing.OutSine, new Vector2(200, 0), ColumnType.all);
+            field.Resize(OsbEasing.OutCirc, 2695, 2901, 600, -height);
+            field.Resize(OsbEasing.OutCirc, 2901, 3309, 250, -height);
+            field.Resize(OsbEasing.OutCirc, 3309, 3517, 600, -height);
+            field.Resize(OsbEasing.OutSine, 3517, 3928, 250, -height);
 
-            field.MoveOriginRelative(10298, 0, OsbEasing.None, new Vector2(-100, 0), ColumnType.all);
-            field.MoveReceptorRelative(10298, 0, OsbEasing.None, new Vector2(100, 0), ColumnType.all);
-            field.MoveOriginRelative(10298, 150, OsbEasing.OutSine, new Vector2(100, 0), ColumnType.all);
-            field.MoveReceptorRelative(10298, 150, OsbEasing.OutSine, new Vector2(-100, 0), ColumnType.all);
+            field.MoveColumnRelativeX(OsbEasing.InOutSine, 4339, 4339 + 50, -field.getColumnWidth(width) * 2, ColumnType.four);
+            field.MoveColumnRelativeX(OsbEasing.InOutSine, 4339, 4339 + 50, field.getColumnWidth(width) * 2, ColumnType.two);
 
-            field.MoveOriginRelative(10504, 0, OsbEasing.None, new Vector2(100, 0), ColumnType.all);
-            field.MoveReceptorRelative(10504, 0, OsbEasing.None, new Vector2(-100, 0), ColumnType.all);
-            field.MoveOriginRelative(10504, 100, OsbEasing.OutSine, new Vector2(-100, 0), ColumnType.all);
-            field.MoveReceptorRelative(10504, 100, OsbEasing.OutSine, new Vector2(100, 0), ColumnType.all);
+            field.MoveColumnRelativeX(OsbEasing.InOutSine, 4750, 4750 + 50, -field.getColumnWidth(width) * 2, ColumnType.two);
+            field.MoveColumnRelativeX(OsbEasing.InOutSine, 4750, 4750 + 50, field.getColumnWidth(width) * 2, ColumnType.four);
 
-            field.RotatePlayFieldStatic(10606, 300, OsbEasing.None, Math.PI * 2);
+            field.MoveColumnRelativeX(OsbEasing.InOutSine, 4956, 4956 + 50, -field.getColumnWidth(width) * 3, ColumnType.four);
+            field.MoveColumnRelativeX(OsbEasing.InOutSine, 4956, 4956 + 50, field.getColumnWidth(width) * 3, ColumnType.one);
 
-            field.MoveOriginRelative(11736, 0, OsbEasing.None, new Vector2(-150, 0), ColumnType.all);
-            field.MoveReceptorRelative(11736, 0, OsbEasing.None, new Vector2(150, 0), ColumnType.all);
-            field.MoveOriginRelative(11736, 500, OsbEasing.OutSine, new Vector2(150, 0), ColumnType.all);
-            field.MoveReceptorRelative(11736, 500, OsbEasing.OutSine, new Vector2(-150, 0), ColumnType.all);
+            field.MoveColumnRelativeX(OsbEasing.InOutSine, 5161, 5161 + 50, -field.getColumnWidth(width) * 3, ColumnType.one);
+            field.MoveColumnRelativeX(OsbEasing.InOutSine, 5161, 5161 + 50, field.getColumnWidth(width) * 3, ColumnType.four);
+
+
+            field.MoveOriginRelative(OsbEasing.OutCirc, 6599, 6599 + 100, new Vector2(-150, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.OutCirc, 6599, 6599 + 100, new Vector2(150, 0), ColumnType.all);
+            field.MoveOriginRelative(OsbEasing.OutSine, 6805, 6805 + 250, new Vector2(150, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.OutSine, 6805, 6805 + 250, new Vector2(-150, 0), ColumnType.all);
+
+            field.RotateReceptorRelative(OsbEasing.OutSine, 7421, 7729, Math.PI * 2);
+
+            field.Resize(OsbEasing.OutCirc, 7216, 7216 + 200, 600, -height);
+            field.Resize(OsbEasing.OutCirc, 7421, 7421 + 200, 250, -height);
+
+
+            field.MoveOriginRelative(OsbEasing.None, 8265, 8265, new Vector2(200, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.None, 8265, 8265, new Vector2(-200, 0), ColumnType.all);
+            field.MoveOriginRelative(OsbEasing.OutSine, 8266, 8266 + 250, new Vector2(-200, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.OutSine, 8266, 8266 + 250, new Vector2(200, 0), ColumnType.all);
+
+            field.MoveOriginRelative(OsbEasing.None, 8654, 8654, new Vector2(-100, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.None, 8654, 8654, new Vector2(100, 0), ColumnType.all);
+            field.MoveOriginRelative(OsbEasing.OutSine, 8655, 8655 + 150, new Vector2(100, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.OutSine, 8655, 8655 + 150, new Vector2(-100, 0), ColumnType.all);
+
+            field.MoveOriginRelative(OsbEasing.None, 8860, 8860, new Vector2(100, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.None, 8860, 8860, new Vector2(-100, 0), ColumnType.all);
+            field.MoveOriginRelative(OsbEasing.OutSine, 8860, 8860 + 150, new Vector2(-100, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.OutSine, 8860, 8860 + 150, new Vector2(100, 0), ColumnType.all);
+
+            field.RotateReceptorRelative(OsbEasing.OutSine, 9065, 9065 + 300, Math.PI * 2);
+
+
+            field.MoveOriginRelative(OsbEasing.None, 9887, 9887, new Vector2(200, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.None, 9887, 9887, new Vector2(-200, 0), ColumnType.all);
+            field.MoveOriginRelative(OsbEasing.OutSine, 9887, 9887 + 250, new Vector2(-200, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.OutSine, 9887, 9887 + 250, new Vector2(200, 0), ColumnType.all);
+
+            field.MoveOriginRelative(OsbEasing.None, 10298, 10298, new Vector2(-100, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.None, 10298, 10298, new Vector2(100, 0), ColumnType.all);
+            field.MoveOriginRelative(OsbEasing.OutSine, 10298, 10298 + 150, new Vector2(100, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.OutSine, 10298, 10298 + 150, new Vector2(-100, 0), ColumnType.all);
+
+            field.MoveOriginRelative(OsbEasing.None, 10504, 10504, new Vector2(100, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.None, 10504, 10504, new Vector2(-100, 0), ColumnType.all);
+            field.MoveOriginRelative(OsbEasing.OutSine, 10504, 10504 + 100, new Vector2(-100, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.OutSine, 10504, 10504 + 100, new Vector2(100, 0), ColumnType.all);
+
+            field.RotateReceptorRelative(OsbEasing.OutSine, 10606, 10606 + 300, Math.PI * 2);
+
+            field.MoveOriginRelative(OsbEasing.None, 11736, 11736, new Vector2(-150, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.None, 11736, 11736, new Vector2(150, 0), ColumnType.all);
+            field.MoveOriginRelative(OsbEasing.OutSine, 11736, 11736 + 500, new Vector2(150, 0), ColumnType.all);
+            field.MoveReceptorRelative(OsbEasing.OutSine, 11736, 11736 + 500, new Vector2(-150, 0), ColumnType.all);
+
 
             double half = 200;
+            double full = half * 2;
             currentTime = 12558;
             float movement = 75;
+            float localHeight = height;
 
             //1
-            field.ZoomAndMove(12557, 0, OsbEasing.None, new Vector2(0.6f, 0.6f), new Vector2(0, -50));
-            field.MoveColumnRelative(12558, half, OsbEasing.OutCirc, new Vector2(movement, 0), ColumnType.four);
-            field.MoveColumnRelative(12558 + half, half, OsbEasing.InCirc, new Vector2(-movement, 0), ColumnType.four);
+            localHeight = height / 0.6f;
+            field.moveField(OsbEasing.None, 12557, 12557, 0, -height * 0.15f);
+            field.Scale(OsbEasing.None, 12557, 12557, new Vector2(0.6f, 0.6f));
+            field.MoveColumnRelative(OsbEasing.OutCirc, 12558, 12558 + half, new Vector2(movement, 0), ColumnType.four);
+            field.MoveColumnRelative(OsbEasing.InCirc, 12558 + half, 12558 + full, new Vector2(-movement, 0), ColumnType.four);
 
             //2
-            field.ZoomAndMove(12968, 0, OsbEasing.None, new Vector2(0.7f, 0.7f), new Vector2(0, -50));
-            field.MoveColumnRelative(12969, half, OsbEasing.OutCirc, new Vector2(-movement, 0), ColumnType.one);
-            field.MoveColumnRelative(12969, half, OsbEasing.OutCirc, new Vector2(-movement, 0), ColumnType.two);
-            field.MoveColumnRelative(12969 + half, half, OsbEasing.InCirc, new Vector2(movement, 0), ColumnType.one);
-            field.MoveColumnRelative(12969 + half, half, OsbEasing.InCirc, new Vector2(movement, 0), ColumnType.two);
+            localHeight = height / 0.6f;
+            field.moveField(OsbEasing.None, 12968, 12968, 0, -height * 0.1f);
+            field.Scale(OsbEasing.None, 12968, 12968, new Vector2(0.7f, 0.7f));
+            field.MoveColumnRelative(OsbEasing.OutCirc, 12969, 12969 + half, new Vector2(-movement, 0), ColumnType.one);
+            field.MoveColumnRelative(OsbEasing.OutCirc, 12969, 12969 + half, new Vector2(-movement, 0), ColumnType.two);
+            field.MoveColumnRelative(OsbEasing.InCirc, 12969 + half, 12969 + full, new Vector2(movement, 0), ColumnType.one);
+            field.MoveColumnRelative(OsbEasing.InCirc, 12969 + half, 12969 + full, new Vector2(movement, 0), ColumnType.two);
 
             //3
-            field.ZoomAndMove(13379, 0, OsbEasing.None, new Vector2(0.8f, 0.8f), new Vector2(0, -50));
-            field.MoveColumnRelative(13380, half, OsbEasing.OutCirc, new Vector2(movement, 0), ColumnType.two);
-            field.MoveColumnRelative(13380, half, OsbEasing.OutCirc, new Vector2(movement, 0), ColumnType.three);
-            field.MoveColumnRelative(13380, half, OsbEasing.OutCirc, new Vector2(movement, 0), ColumnType.four);
-            field.MoveColumnRelative(13380 + half, half, OsbEasing.InCirc, new Vector2(-movement, 0), ColumnType.two);
-            field.MoveColumnRelative(13380 + half, half, OsbEasing.InCirc, new Vector2(-movement, 0), ColumnType.three);
-            field.MoveColumnRelative(13380 + half, half, OsbEasing.InCirc, new Vector2(-movement, 0), ColumnType.four);
+            field.moveField(OsbEasing.None, 13379, 13379, 0, -height * 0.1f);
+            field.Scale(OsbEasing.None, 13379, 13379, new Vector2(0.8f, 0.8f));
+            field.MoveColumnRelative(OsbEasing.OutCirc, 13380, 13380 + half, new Vector2(movement, 0), ColumnType.two);
+            field.MoveColumnRelative(OsbEasing.OutCirc, 13380, 13380 + half, new Vector2(movement, 0), ColumnType.three);
+            field.MoveColumnRelative(OsbEasing.OutCirc, 13380, 13380 + half, new Vector2(movement, 0), ColumnType.four);
+            field.MoveColumnRelative(OsbEasing.InCirc, 13380 + half, 13380 + full, new Vector2(-movement, 0), ColumnType.two);
+            field.MoveColumnRelative(OsbEasing.InCirc, 13380 + half, 13380 + full, new Vector2(-movement, 0), ColumnType.three);
+            field.MoveColumnRelative(OsbEasing.InCirc, 13380 + half, 13380 + full, new Vector2(-movement, 0), ColumnType.four);
 
             //4
-            field.ZoomAndMove(13790, 0, OsbEasing.None, new Vector2(1f, 1f), new Vector2(0, -90));
-            field.moveFieldX(13791, half, OsbEasing.OutCirc, -movement);
-            field.moveFieldX(13791 + half, half, OsbEasing.InCirc, movement);
+            field.moveField(OsbEasing.None, 13790, 13790, 0, -height * 0.2f);
+            field.Scale(OsbEasing.None, 13790, 13790, new Vector2(1f, 1f));
+            field.moveFieldX(OsbEasing.OutCirc, 13791, 13791 + half, -movement);
+            field.moveFieldX(OsbEasing.InCirc, 13791 + half, 13791 + full, movement);
+
+            field.Scale(OsbEasing.None, 14202, 14202, new Vector2(0.45f, 0.45f));
+            field.moveField(OsbEasing.None, 14202, 14202, 0, height * .56f);
+
 
             var localDuration = 820;
             currentTime = 14202;
             movement = 250;
 
-            field.ZoomAndMove(14202, 0, OsbEasing.None, new Vector2(0.45f, 0.45f), new Vector2(0, 290));
-
             for (int i = 0; i < 3; i++)
             {
-                field.RotatePlayFieldStatic(currentTime, localDuration, OsbEasing.OutSine, Math.PI * 2);
-                field.moveField(currentTime, localDuration, OsbEasing.OutSine, movement, 0);
+                field.RotateReceptorRelative(OsbEasing.OutSine, currentTime, currentTime + localDuration, Math.PI * 2);
+                field.moveFieldX(OsbEasing.OutSine, currentTime, currentTime + localDuration, movement);
                 currentTime += localDuration;
-                field.RotatePlayFieldStatic(currentTime, localDuration, OsbEasing.InSine, -Math.PI * 2);
-                field.moveField(currentTime, localDuration, OsbEasing.InSine, -movement, 0);
+                field.RotateReceptorRelative(OsbEasing.InSine, currentTime, currentTime + localDuration, -Math.PI * 2);
+                field.moveFieldX(OsbEasing.InSine, currentTime, currentTime + localDuration, -movement);
                 currentTime += localDuration;
-                field.RotatePlayFieldStatic(currentTime, localDuration, OsbEasing.OutSine, -Math.PI * 2);
-                field.moveField(currentTime, localDuration, OsbEasing.OutSine, -movement, 0);
+                field.RotateReceptorRelative(OsbEasing.OutSine, currentTime, currentTime + localDuration, -Math.PI * 2);
+                field.moveFieldX(OsbEasing.OutSine, currentTime, currentTime + localDuration, -movement);
                 currentTime += localDuration;
-                field.RotatePlayFieldStatic(currentTime, localDuration, OsbEasing.InSine, Math.PI * 2);
-                field.moveField(currentTime, localDuration, OsbEasing.InSine, movement, 0);
+                field.RotateReceptorRelative(OsbEasing.InSine, currentTime, currentTime + localDuration, Math.PI * 2);
+                field.moveFieldX(OsbEasing.InSine, currentTime, currentTime + localDuration, movement);
                 currentTime += localDuration;
             }
 
             //ApplyYSineToPlayField(14202, 25709);
 
-            field.RotatePlayFieldStatic(currentTime, localDuration, OsbEasing.OutSine, Math.PI * 2);
-            field.moveField(currentTime, localDuration, OsbEasing.OutSine, movement, 0);
+            field.RotateReceptorRelative(OsbEasing.OutSine, currentTime, currentTime + localDuration, Math.PI * 2);
+            field.moveFieldX(OsbEasing.OutSine, currentTime, currentTime + localDuration, movement);
             currentTime += localDuration;
-            field.RotatePlayFieldStatic(currentTime, localDuration, OsbEasing.InSine, -Math.PI * 2);
-            field.moveField(currentTime, localDuration, OsbEasing.InSine, -movement, 0);
+            field.RotateReceptorRelative(OsbEasing.InSine, currentTime, currentTime + localDuration, -Math.PI * 2);
+            field.moveFieldX(OsbEasing.InSine, currentTime, currentTime + localDuration, -movement);
 
-            field.MoveReceptorRelative(25709, 200, OsbEasing.OutCirc, new Vector2(0, -50), ColumnType.all);
-            field.MoveReceptorRelative(26017, 200, OsbEasing.OutCirc, new Vector2(0, -100), ColumnType.all);
-            field.MoveReceptorRelative(26325, 200, OsbEasing.OutCirc, new Vector2(0, -200), ColumnType.all);
-            field.MoveOriginRelative(25709, 200, OsbEasing.OutCirc, new Vector2(0, 50), ColumnType.all);
-            field.MoveOriginRelative(26325, 200, OsbEasing.OutCirc, new Vector2(0, height - 50), ColumnType.all);
 
-            ApplySineToPlayField(26942, 29921);
+            field.Resize(OsbEasing.OutCirc, 25709, 25709 + 200, width, -height + 150);
+            field.moveFieldY(OsbEasing.OutCirc, 25709, 25709 + 200, -70);
+
+            field.Resize(OsbEasing.OutCirc, 26017, 26017 + 200, width, -height + 300);
+            field.moveFieldY(OsbEasing.OutCirc, 26017, 26017 + 200, -100);
+
+            field.Resize(OsbEasing.OutCirc, 26325, 26325 + 200, width, height);
+            field.moveFieldY(OsbEasing.OutCirc, 26325, 26325 + 200, -185);
+
+            field.Resize(OsbEasing.InSine, 26531, 26942, width, 0);
+            field.Resize(OsbEasing.OutCirc, 26942, 27353, width, height);
+            field.RotateReceptorRelative(OsbEasing.OutCirc, 26942, 27353, Math.PI * 2f, ColumnType.all);
 
             flipColumn(29921, 200, OsbEasing.OutCirc, ColumnType.four);
             flipColumn(30024, 200, OsbEasing.OutCirc, ColumnType.three);
             flipColumn(30127, 200, OsbEasing.OutCirc, ColumnType.two);
             flipColumn(30230, 200, OsbEasing.OutCirc, ColumnType.one);
 
-            ApplySineToPlayField(30230 + 200, 33517);
-
             flipColumn(33517, 33928 - 33517, OsbEasing.OutSine, ColumnType.all);
-
-            ApplySineToPlayField(33928, 36394);
 
             flipColumn(36394, 200, OsbEasing.OutCirc, ColumnType.four);
             flipColumn(36497, 200, OsbEasing.OutCirc, ColumnType.three);
             flipColumn(36599, 200, OsbEasing.OutCirc, ColumnType.two);
             flipColumn(36702, 200, OsbEasing.OutCirc, ColumnType.one);
 
-            ApplySineToPlayField(36702 + 200, 40093);
 
-            field.ZoomMoveAndRotate(40093, 40504 - 40093 - 50, OsbEasing.OutSine, new Vector2(1f, 1f), new Vector2(-50, -50), Math.PI / 7, 50);
-            field.Zoom(40504, 0, OsbEasing.None, new Vector2(0.45f, 0.45f), true);
-            field.ScalePlayField(40504, 100, OsbEasing.OutSine, 225, 500);
+            ApplySineToPlayField(27353, 40093);
 
-            Log(field.columns[ColumnType.one].origin.getCurrentPosition(41017));
-            Log(field.columns[ColumnType.one].receptor.getCurrentPosition(41017));
+            field.Scale(OsbEasing.InOutSine, 40093, 40452, new Vector2(.8f, 0.8f));
+            field.Rotate(OsbEasing.InOutSine, 40093, 40452, .4, CenterType.middle);
+            field.moveField(OsbEasing.InOutSine, 40093, 40452, -50, -200);
 
-            DrawInstance draw = new DrawInstance(field, 900, scrollSpeed, updatesPerSecond, OsbEasing.None, false, fadeTime, fadeTime);
+            field.ScaleColumn(OsbEasing.InSine, 40503, 40914, new Vector2(0.5f), ColumnType.all);
+
+            field.MoveReceptorAbsolute(OsbEasing.InSine, 40503, 40914, new Vector2(226.25f, 430), ColumnType.one);
+            field.MoveReceptorAbsolute(OsbEasing.InSine, 40503, 40914, new Vector2(288.75f, 430), ColumnType.two);
+            field.MoveReceptorAbsolute(OsbEasing.InSine, 40503, 40914, new Vector2(351.25f, 430), ColumnType.three);
+            field.MoveReceptorAbsolute(OsbEasing.InSine, 40503, 40914, new Vector2(413.75f, 430), ColumnType.four);
+
+            field.MoveOriginAbsolute(OsbEasing.InSine, 40503, 40914, new Vector2(226.25f, -70), ColumnType.one);
+            field.MoveOriginAbsolute(OsbEasing.InSine, 40503, 40914, new Vector2(288.75f, -70), ColumnType.two);
+            field.MoveOriginAbsolute(OsbEasing.InSine, 40503, 40914, new Vector2(351.25f, -70), ColumnType.three);
+            field.MoveOriginAbsolute(OsbEasing.InSine, 40503, 40914, new Vector2(413.75f, -70), ColumnType.four);
+
+            DrawInstance draw = new DrawInstance(field, 1051, scrollSpeed, updatesPerSecond, OsbEasing.None, false, fadeTime, fadeTime);
+            //draw.addSV(8038, 2);
             draw.setNoteRotationPrecision(0f);
             draw.setNoteMovementPrecision(0f);
             draw.setHoldRotationPrecision(0f);
-            draw.drawViaEquation(duration - 200, NoteFunction, true);
+            Log(draw.drawViaEquation(duration - 200, NoteFunction, true));
 
         }
 
-        public Vector2 NoteFunction(Vector2 position, double currentTime, double t)
+        public Vector2 NoteFunction2(EquationParameters parameters)
         {
-            float y = position.Y;
-            float x = position.X;
+            return parameters.position;
+        }
+
+        public Vector2 NoteFunction(EquationParameters parameters)
+        {
+            float x = parameters.position.X;
+            float y = parameters.position.Y;
+            double currentTime = parameters.time;
+            float t = parameters.progress;
 
             if (currentTime > 2695 && currentTime < 3106 && t < 0.8)
             {
@@ -356,15 +410,16 @@ namespace StorybrewScripts
                 if (currentColumn.type == type || type == ColumnType.all)
                 {
 
-                    Vector2 receptorPos = currentColumn.getReceptorPosition(starttime);
-                    Vector2 originPos = currentColumn.getOriginPosition(starttime);
-                    Vector2 center = new Vector2(receptorPos.X, 240);
+                    Vector2 receptorPos = currentColumn.ReceptorPositionAt(starttime);
+                    Vector2 originPos = currentColumn.OriginPositionAt(starttime);
+                    Vector2 center = new Vector2(427, 240);
 
-                    Vector2 flippedReceptorPos = center + (center - receptorPos);
-                    Vector2 flippedOriginPos = center + (center - originPos);
+                    // Calculate the change needed to flip the positions
+                    Vector2 changeReceptorPos = (center - receptorPos) * 2;
+                    Vector2 changeOriginPos = (center - originPos) * 2;
 
-                    currentColumn.receptor.MoveReceptor(starttime, flippedReceptorPos, easing, duration);
-                    currentColumn.origin.MoveOrigin(starttime, flippedOriginPos, easing, duration);
+                    currentColumn.receptor.MoveReceptorRelativeY(easing, starttime, starttime + duration, changeReceptorPos.Y);
+                    currentColumn.origin.MoveOriginRelativeY(easing, starttime, starttime + duration, changeOriginPos.Y);
                 }
 
             }
@@ -408,7 +463,7 @@ namespace StorybrewScripts
                 // Using sine for y-axis with a phase difference to start at the top point
                 float y = (float)Utility.SineWaveValue(1.5, frequencyY, lastPhaseY);
 
-                field.moveField(starttime, stepDuration, easing, x, y);
+                field.moveField(easing, starttime, starttime + stepDuration, x, y);
 
                 lastPhaseX += frequencyX;
                 lastPhaseY += frequencyX;
@@ -433,7 +488,7 @@ namespace StorybrewScripts
                 // Using sine for y-axis with a phase difference to start at the top point
                 float y = (float)Utility.CosWaveValue(1, frequencyY, phase);
 
-                field.moveField(starttime, stepDuration, easing, 0, y);
+                field.moveField(easing, starttime, starttime + stepDuration, 0, y);
 
                 phase += frequencyX;
                 starttime += stepDuration;

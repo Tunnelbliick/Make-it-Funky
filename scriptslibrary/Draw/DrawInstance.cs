@@ -42,6 +42,7 @@ namespace StorybrewScripts
 
         public Dictionary<double, double> updatesPerSecondDictionary = new Dictionary<double, double>();
 
+        public Dictionary<double, double> scrollSpeedMultiplier = new Dictionary<double, double>();
 
         public Dictionary<ColumnType, List<Anchor>> notePathByColumn = new Dictionary<ColumnType, List<Anchor>>();
 
@@ -56,6 +57,10 @@ namespace StorybrewScripts
             this.rotateToFaceReceptor = rotateToFaceReceptor;
             this.iterationLength = 1000 / updatesPerSecond;
             this.changeUpdateRate(starttime, updatesPerSecond);
+
+            this.noteScaleEasing = easing;
+            this.holdScaleEasing = easing;
+
 
             return this;
 
@@ -90,30 +95,39 @@ namespace StorybrewScripts
             this.changeUpdateRate(starttime, updatesPerSecond);
         }
 
+
+
+
+        [Obsolete("drawNotesStutteredByOriginToReceptor is deprecated, please use drawViaEquation instead.")]
         public void drawNotesStutteredByOriginToReceptor(double duration, bool renderReceptor = true)
         {
             Stutter.drawNotesStutteredByOriginToReceptor(this, duration, renderReceptor);
         }
 
+        [Obsolete("drawNotesByOriginToReceptor is deprecated, please use drawViaEquation instead.")]
         public void drawNotesByOriginToReceptor(double duration, bool renderReceptor = true)
         {
             OriginToReceptor.drawNotesByOriginToReceptor(this, duration, renderReceptor);
         }
 
+        [Obsolete("drawNotesByAnchors is deprecated, please use drawViaEquation instead.")]
         public void drawNotesByAnchors(double duration, PathType type = PathType.line)
         {
             ByAnchors.drawNotesByAnchors(this, duration, type);
         }
 
+        [Obsolete("drawPath is deprecated, please use drawViaEquation instead.")]
         public void drawPath(double starttime, double endtime, StoryboardLayer layer, string spritePath, PathType type, int precision, int updatesPerSecond = 3)
         {
             PathWay.DrawPath(this, starttime, endtime, layer, spritePath, type, precision, updatesPerSecond);
         }
 
-        public string drawViaEquation(double duration, EquationFunction noteFunction, bool renderReceptor = true) {
-            return ByEquation.drawViaEquation(this, duration, noteFunction, renderReceptor);
+        public string drawViaEquation(double duration, EquationFunction noteFunction, bool renderReceptor = true, bool renderHitSounds = true)
+        {
+            return ByEquation.drawViaEquation(this, duration, noteFunction, renderReceptor, renderHitSounds);
         }
 
+        [Obsolete("")]
         public List<Vector2> GetPathAnchorVectors(List<Anchor> notePath, double currentTime)
         {
             List<Vector2> points = new List<Vector2>();
@@ -125,6 +139,7 @@ namespace StorybrewScripts
             return points;
         }
 
+        [Obsolete("")]
         public void addAnchor(ColumnType column, Vector2 position, bool debug, StoryboardLayer debugLayer)
         {
 
@@ -174,6 +189,7 @@ namespace StorybrewScripts
             }
         }
 
+        [Obsolete("")]
         // This adds an anchor relative to the current position of the column
         public String addRelativeAnchor(ColumnType column, double starttime, Vector2 relativeOffset, bool debug, StoryboardLayer debugLayer)
         {
@@ -200,6 +216,7 @@ namespace StorybrewScripts
             return debugstring;
         }
 
+        [Obsolete("")]
         public String addRelativeAnchorList(ColumnType column, double starttime, List<Vector2> relativeOffset, bool debug, StoryboardLayer debugLayer)
         {
 
@@ -225,6 +242,7 @@ namespace StorybrewScripts
             return debugstring;
         }
 
+        [Obsolete("")]
         private String addRelative(ColumnType column, double starttime, Vector2 relativeOffset, bool debug, StoryboardLayer debugLayer)
         {
 
@@ -237,8 +255,8 @@ namespace StorybrewScripts
 
             List<Anchor> notePath = this.notePathByColumn[column];
             Column currentColumn = this.playfieldInstance.columns[column];
-            Vector2 originPosition = currentColumn.getOriginPosition(starttime);
-            Vector2 receptorPosition = currentColumn.getReceptorPositionForNotes(starttime);
+            Vector2 originPosition = currentColumn.OriginPositionAt(starttime);
+            Vector2 receptorPosition = currentColumn.ReceptorPositionAt(starttime);
             int index = 0;
 
             float blend = 1.0f / (notePath.Count + 1);
@@ -271,6 +289,7 @@ namespace StorybrewScripts
             return debugString;
         }
 
+        [Obsolete("")]
         private String addListRelative(ColumnType column, double starttime, List<Vector2> relativeOffsets, bool debug, StoryboardLayer debugLayer)
         {
 
@@ -283,8 +302,8 @@ namespace StorybrewScripts
 
             List<Anchor> notePath = this.notePathByColumn[column];
             Column currentColumn = this.playfieldInstance.columns[column];
-            Vector2 originPosition = currentColumn.getOriginPosition(starttime);
-            Vector2 receptorPosition = currentColumn.getReceptorPosition(starttime);
+            Vector2 originPosition = currentColumn.OriginPositionAt(starttime);
+            Vector2 receptorPosition = currentColumn.ReceptorPositionAt(starttime);
 
             int index = 0;
 
@@ -327,6 +346,7 @@ namespace StorybrewScripts
             return debugString;
         }
 
+        [Obsolete("")]
         public void ManipulateAnchorRelative(int index, double starttime, double transitionTime, Vector2 newPosition, OsbEasing easing, ColumnType column = ColumnType.all)
         {
 
@@ -368,6 +388,7 @@ namespace StorybrewScripts
 
         }
 
+        [Obsolete("")]
         public double ResetAnchors(double starttime, double transitionTime, OsbEasing easing, ColumnType column = ColumnType.all)
         {
             if (column == ColumnType.all)
@@ -383,8 +404,8 @@ namespace StorybrewScripts
 
                     Column selectedColumn = this.playfieldInstance.columns[currentColumn];
 
-                    Vector2 originPosition = selectedColumn.getOriginPosition(starttime);
-                    Vector2 receptorPosition = selectedColumn.getReceptorPosition(starttime);
+                    Vector2 originPosition = selectedColumn.OriginPositionAt(starttime);
+                    Vector2 receptorPosition = selectedColumn.ReceptorPositionAt(starttime);
 
                     float blend = 1.0f / (notePath.Count - 1);
                     int index = 0;
@@ -410,8 +431,8 @@ namespace StorybrewScripts
                 List<Anchor> notePath = notePathByColumn[column];
 
                 Column selectedColumn = this.playfieldInstance.columns[column];
-                Vector2 originPosition = selectedColumn.getOriginPosition(starttime);
-                Vector2 receptorPosition = selectedColumn.getReceptorPosition(starttime);
+                Vector2 originPosition = selectedColumn.OriginPositionAt(starttime);
+                Vector2 receptorPosition = selectedColumn.ReceptorPositionAt(starttime);
 
                 float blend = 1.0f / (notePath.Count - 1);
                 int index = 0;
@@ -432,7 +453,7 @@ namespace StorybrewScripts
 
         }
 
-
+        [Obsolete("")]
         public void ManipulateAnchorAbsolute(int index, double starttime, double transitionTime, Vector2 newPosition, OsbEasing easing, ColumnType column)
         {
 
@@ -470,6 +491,7 @@ namespace StorybrewScripts
 
         }
 
+        [Obsolete("")]
         // TODO figure this shit out!
         public String UpdateAnchors(double starttime, double duration, ColumnType column)
         {
@@ -495,8 +517,8 @@ namespace StorybrewScripts
 
                         List<Anchor> notePath = this.notePathByColumn[type];
                         Column currentColumn = this.playfieldInstance.columns[type];
-                        Vector2 originPosition = currentColumn.getOriginPosition(currentTime + localIterationRate);
-                        Vector2 receptorPosition = currentColumn.getReceptorPositionForNotes(currentTime + localIterationRate);
+                        Vector2 originPosition = currentColumn.OriginPositionAt(currentTime + localIterationRate);
+                        Vector2 receptorPosition = currentColumn.ReceptorPositionAt(currentTime + localIterationRate);
 
                         int index = 0;
                         float blend = 1.0f / (notePath.Count - 1);
@@ -531,6 +553,7 @@ namespace StorybrewScripts
 
         }
 
+        [Obsolete("")]
         public double FadePath(double starttime, double duration, OsbEasing easing, float fade, ColumnType column = ColumnType.all)
         {
 
@@ -561,6 +584,7 @@ namespace StorybrewScripts
             return starttime + duration;
         }
 
+        [Obsolete("")]
         public String debugBezier(double starttime, StoryboardLayer layer)
         {
 
@@ -635,14 +659,39 @@ namespace StorybrewScripts
 
             return currentFadeEffect.Value;
         }
+        public double findSV(double time)
+        {
+           var sv =  scrollSpeedMultiplier
+                 .Where(kvp => kvp.Key <= time)
+                 .OrderByDescending(kvp => kvp.Key)
+                 .FirstOrDefault();
+
+            if(sv.Value == 0) {
+                return 1;
+            }
+
+            return sv.Value;
+
+        }
 
         public void changeUpdateRate(double time, double updatesPerSecond)
         {
             updatesPerSecondDictionary.Add(Math.Max(time - this.easetime, 0), updatesPerSecond);
         }
 
-        public void SetColor(Color4 color) {
+        public void SetColor(Color4 color)
+        {
             this.color = color;
+        }
+
+        public void multiplier(Color4 color)
+        {
+            this.color = color;
+        }
+
+        public void addSV(double time, double multiplier)
+        {
+            scrollSpeedMultiplier.Add(time, multiplier);
         }
     }
 }

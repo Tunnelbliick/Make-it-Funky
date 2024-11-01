@@ -47,16 +47,16 @@ namespace StorybrewScripts
             {
 
                 this.isSlider = true;
-                var sliderDuration = this.endtime - this.starttime;
+                var sliderDuration = this.endtime - this.starttime - 20;
 
                 for (double ellapsedTime = 0; sliderDuration > ellapsedTime; ellapsedTime += msPerPart)
                 {
                     var endtime = ellapsedTime + msPerPart;
                     var duration = msPerPart;
 
-                    OsbSprite body = this.layer.CreateSprite("sb/sprites/hold_body.png");
+                    OsbSprite body = this.layer.CreateSprite(isColored == false ? "sb/sprites/hold_body.png" : "sb/sprites/hold_color.png");
 
-                    SliderParts sliderPositon = new SliderParts(new Vector2(10, 10), this.starttime + ellapsedTime, duration, body);
+                    SliderParts sliderPositon = new SliderParts(new Vector2(10, 10), this.starttime + ellapsedTime + 20, duration, body);
                     this.sliderPositions.Add(sliderPositon);
 
                 }
@@ -183,14 +183,14 @@ namespace StorybrewScripts
                 }*/
 
                 note.Fade(starttime, starttime + fadeInTime, 0, initialFade);
-                note.Fade(endtime, 0);
+                note.Fade(starttime, 0);
                 renderEnd = endtime;
             }
             else
             {
                 note.Fade(starttime - 1, starttime + fadeInTime, 0, initialFade);
-                note.Fade(endtime + fadeOutTime + 1, 0);
-                renderEnd = endtime + fadeOutTime;
+                note.Fade(endtime, 0);
+                renderEnd = endtime;
             }
 
             renderStart = starttime;
@@ -198,8 +198,10 @@ namespace StorybrewScripts
 
         }
 
-        public void ApplyHitLightingToNote(double startime, double endtime, double fadeOutTime, Receptor currentReceptor, double iterationRate = 10)
+        public string ApplyHitLightingToNote(double startime, double endtime, double fadeOutTime, Column column, double iterationRate = 10)
         {
+
+            string debug = "";
 
             double renderStart = startime;
             double renderEnd = endtime + fadeOutTime;
@@ -207,11 +209,13 @@ namespace StorybrewScripts
             var originalScale = new Vector2(1f, 1f);
             var baseNoteScale = new Vector2(0.5f, 0.5f);
 
+            Receptor currentReceptor = column.receptor;
+
             var scaleRatio = Vector2.Divide(currentReceptor.renderedSprite.ScaleAt(renderStart), baseNoteScale);
             var currentScale = originalScale * scaleRatio;
 
             Vector2 currentPosition = currentReceptor.renderedSprite.PositionAt(renderStart);
-            OsbSprite hitlighting = layer.CreateSprite($"sb/sprites/{GetRandomJudgement()}.png", OsbOrigin.Centre, currentPosition);
+            //OsbSprite hitlighting = column.hitlighting;
 
             float currentOpacity = currentReceptor.renderedSprite.OpacityAt(renderStart);
             double currentRotation = currentReceptor.renderedSprite.RotationAt(renderStart);
@@ -219,35 +223,6 @@ namespace StorybrewScripts
             OsbSprite hold;
 
             double localCurrentTime = renderStart;
-
-            if (isSlider == false)
-            {
-                // Handle non hold
-                while (localCurrentTime < renderEnd)
-                {
-                    double localTime = localCurrentTime + iterationRate;
-
-                    scaleRatio = Vector2.Divide(currentReceptor.renderedSprite.ScaleAt(localTime), baseNoteScale);
-                    var newScale = originalScale * scaleRatio;
-
-                    Vector2 nexPosition = currentReceptor.renderedSprite.PositionAt(localTime);
-                    float newOpactiy = currentReceptor.renderedSprite.OpacityAt(localCurrentTime);
-                    double newRotation = currentReceptor.renderedSprite.RotationAt(localTime);
-
-                    hitlighting.Move(localCurrentTime, localTime, currentPosition, nexPosition);
-                    hitlighting.ScaleVec(localCurrentTime, localTime, currentScale, newScale);
-                    hitlighting.Fade(localCurrentTime, newOpactiy);
-                    hitlighting.Rotate(localCurrentTime, localTime, currentRotation, newRotation);
-
-                    currentScale = newScale;
-                    currentRotation = newRotation;
-                    currentPosition = nexPosition;
-                    currentOpacity = newOpactiy;
-                    localCurrentTime += iterationRate;
-                }
-
-                hitlighting.Fade(renderEnd, 0);
-            }
 
             if (isSlider == true)
             {
@@ -260,33 +235,6 @@ namespace StorybrewScripts
 
                 scaleRatio = Vector2.Divide(currentReceptor.renderedSprite.ScaleAt(renderStart), baseNoteScale);
                 var currentHoldScale = originalScale * scaleRatio;
-
-                while (localCurrentTime < Math.Min(renderStart + fadeOutTime, this.endtime))
-                {
-                    double localTime = localCurrentTime + iterationRate;
-
-                    scaleRatio = Vector2.Divide(currentReceptor.renderedSprite.ScaleAt(localTime), baseNoteScale);
-                    var newScale = originalScale * scaleRatio;
-
-                    Vector2 nexPosition = currentReceptor.renderedSprite.PositionAt(localTime);
-                    float newOpactiy = currentReceptor.renderedSprite.OpacityAt(localTime);
-                    double newRotation = currentReceptor.renderedSprite.RotationAt(localTime);
-
-                    hitlighting.Move(localCurrentTime, localTime, currentPosition, nexPosition);
-                    hitlighting.ScaleVec(localCurrentTime, localTime, currentScale, newScale);
-                    hitlighting.Fade(localCurrentTime, newOpactiy);
-                    hitlighting.Rotate(localCurrentTime, localTime, currentRotation, newRotation);
-
-                    currentScale = newScale;
-                    currentRotation = newRotation;
-                    currentPosition = nexPosition;
-                    currentOpacity = newOpactiy;
-                    localCurrentTime += iterationRate;
-                }
-
-                hitlighting.Fade(renderStart + fadeOutTime, 0);
-
-                // render out hold sprite
 
                 localCurrentTime = renderStart;
 
@@ -314,9 +262,11 @@ namespace StorybrewScripts
                     localCurrentTime += iterationRate;
                 }
 
-                hold.Fade(renderEnd, 0);
+                hold.Fade(this.endtime, this.endtime + 50, 1, 0);
 
             }
+
+            return debug;
 
         }
 
@@ -354,12 +304,12 @@ namespace StorybrewScripts
                 }*/
 
                 note.Fade(starttime, starttime + fadeInTime, 0, 1);
-                note.Fade(endTime, 0);
+                note.Fade(starttime, 0);
             }
             else
             {
                 note.Fade(starttime, starttime + fadeInTime, 0, 1);
-                note.Fade(endTime + fadeOutTime, 0);
+                note.Fade(endTime, 0);
             }
 
         }
@@ -512,10 +462,10 @@ namespace StorybrewScripts
             note.Rotate(easing, starttime, starttime + duration, getRotation(starttime), rotation);
         }
 
-        public void Scale(double starttime, double duration, OsbEasing easeing, Vector2 before, Vector2 after)
+        public void Scale(double starttime, double endtime, OsbEasing easeing, Vector2 before, Vector2 after)
         {
             OsbSprite note = this.noteSprite;
-            note.ScaleVec(easeing, starttime, starttime + duration, before, after);
+            note.ScaleVec(easeing, starttime, endtime, before, after);
         }
 
         public void ScaleDirect(double starttime, double duration, OsbEasing easeing, Vector2 before, Vector2 after)
@@ -524,7 +474,8 @@ namespace StorybrewScripts
             note.ScaleVec(easeing, starttime, starttime + duration, before, after);
         }
 
-        public void Color(double startime, Color4 color) {
+        public void Color(double startime, Color4 color)
+        {
             OsbSprite note = this.noteSprite;
             note.Color(starttime, color);
         }
@@ -542,6 +493,14 @@ namespace StorybrewScripts
 
 
             return note.OpacityAt(currentTime);
+        }
+
+        public Vector2 ScaleAt(double currentTime)
+        {
+            OsbSprite note = this.noteSprite;
+
+
+            return note.ScaleAt(currentTime);
         }
 
         static string GetRandomJudgement()

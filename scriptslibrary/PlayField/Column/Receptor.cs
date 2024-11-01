@@ -18,345 +18,312 @@ using OpenTK.Graphics;
 
 namespace StorybrewScripts
 {
-    public class Receptor : StoryboardObjectGenerator
+    public class Receptor
     {
 
         public string receptorSpritePath = "";
         public Vector2 position = new Vector2(0, 0);
         public StoryboardLayer layer;
-        public OsbSprite receptorSprite;
         public OsbSprite renderedSprite;
-        public Operation currentOperation;
         public OsbSprite debug;
         public string appliedTransformation = "";
-        List<Operation> operationLog = new List<Operation>();
+
+        public SortedDictionary<double, float> positionX = new SortedDictionary<double, float>();
+        public SortedDictionary<double, float> positionY = new SortedDictionary<double, float>();
+
+        public OsbSprite light;
+        public OsbSprite hit;
+
+        private readonly object lockX = new object();
+        private readonly object lockY = new object();
 
         // Rotation in radiants
         public double rotation = 0f;
         public double startRotation = 0f;
         public ColumnType columnType;
-
         public double bpmOffset;
         public double bpm;
+        private double deltaIncrement = 1;
 
-        public KeyframedValue<Vector2> movmenetKeyFrames = new KeyframedValue<Vector2>(InterpolatingFunctions.Vector2);
-
-        public override void Generate()
+        public Receptor(String receptorSpritePath, double rotation, StoryboardLayer layer, CommandScale scale, double starttime, ColumnType type, double delta)
         {
 
-        }
+            this.deltaIncrement = delta;
 
-        public Receptor(String receptorSpritePath, double rotation, StoryboardLayer layer, CommandScale scale, double starttime, ColumnType type)
-        {
-
-            OsbSprite receptor = layer.CreateSprite("sb/transparent.png", OsbOrigin.Centre);
             OsbSprite receptorSprite = layer.CreateSprite(receptorSpritePath, OsbOrigin.Centre);
+            OsbSprite light = layer.CreateSprite("sb/sprites/light.png", OsbOrigin.Centre);
+            OsbSprite hit = layer.CreateSprite("sb/sprites/hit.png", OsbOrigin.Centre);
 
-            movmenetKeyFrames.Add(starttime, receptor.PositionAt(starttime));
+            positionX.Add(0, 0);
+            positionY.Add(0, 0);
 
             switch (type)
             {
                 case ColumnType.one:
-                    receptor.Rotate(starttime - 1, 1 * Math.PI / 2);
+                    light.Rotate(starttime - 1, 1 * Math.PI / 2);
+                    hit.Rotate(starttime - 1, 1 * Math.PI / 2);
+                    receptorSprite.Rotate(starttime - 1, 1 * Math.PI / 2);
                     break;
                 case ColumnType.two:
-                    receptor.Rotate(starttime - 1, 0 * Math.PI / 2);
+                    light.Rotate(starttime - 1, 0 * Math.PI / 2);
+                    hit.Rotate(starttime - 1, 0 * Math.PI / 2);
+                    receptorSprite.Rotate(starttime - 1, 0 * Math.PI / 2);
                     break;
                 case ColumnType.three:
-                    receptor.Rotate(starttime - 1, 2 * Math.PI / 2);
+                    light.Rotate(starttime - 1, 2 * Math.PI / 2);
+                    hit.Rotate(starttime - 1, 2 * Math.PI / 2);
+                    receptorSprite.Rotate(starttime - 1, 2 * Math.PI / 2);
                     break;
                 case ColumnType.four:
-                    receptor.Rotate(starttime - 1, 3 * Math.PI / 2);
+                    light.Rotate(starttime - 1, 3 * Math.PI / 2);
+                    hit.Rotate(starttime - 1, 3 * Math.PI / 2);
+                    receptorSprite.Rotate(starttime - 1, 3 * Math.PI / 2);
                     break;
             }
 
-            receptor.ScaleVec(starttime, scale);
+            receptorSprite.ScaleVec(starttime, scale);
+            light.ScaleVec(starttime, scale * 2f);
 
+            this.light = light;
+            this.hit = hit;
             this.columnType = type;
             this.receptorSpritePath = receptorSpritePath;
             this.renderedSprite = receptorSprite;
             this.rotation = rotation;
             this.startRotation = rotation;
             this.layer = layer;
-            this.receptorSprite = receptor;
 
         }
 
-        public Receptor(String receptorSpritePath, double rotation, StoryboardLayer layer, Vector2 position, ColumnType type)
+        public Receptor(string receptorSpritePath, double rotation, StoryboardLayer layer, Vector2 position, ColumnType type, double delta)
         {
             OsbSprite receptor = layer.CreateSprite("sb/transparent.png", OsbOrigin.Centre);
             OsbSprite receptorSprite = layer.CreateSprite(receptorSpritePath, OsbOrigin.Centre);
+            OsbSprite light = layer.CreateSprite("sb/sprites/light.png", OsbOrigin.Centre);
+            OsbSprite hit = layer.CreateSprite("sb/sprites/hit.png", OsbOrigin.Centre);
 
-            movmenetKeyFrames.Add(0, position);
+            this.deltaIncrement = delta;
+
+            positionX.Add(0, 0);
+            positionY.Add(0, 0);
 
             switch (type)
             {
                 case ColumnType.one:
+                    light.Rotate(0 - 1, 1 * Math.PI / 2);
+                    hit.Rotate(0 - 1, 1 * Math.PI / 2);
                     receptor.Rotate(0 - 1, 1 * Math.PI / 2);
                     break;
                 case ColumnType.two:
+                    light.Rotate(0 - 1, 0 * Math.PI / 2);
+                    hit.Rotate(0 - 1, 0 * Math.PI / 2);
                     receptor.Rotate(0 - 1, 0 * Math.PI / 2);
                     break;
                 case ColumnType.three:
+                    light.Rotate(0 - 1, 2 * Math.PI / 2);
+                    hit.Rotate(0 - 1, 2 * Math.PI / 2);
                     receptor.Rotate(0 - 1, 2 * Math.PI / 2);
                     break;
                 case ColumnType.four:
+                    light.Rotate(0 - 1, 3 * Math.PI / 2);
+                    hit.Rotate(0 - 1, 3 * Math.PI / 2);
                     receptor.Rotate(0 - 1, 3 * Math.PI / 2);
                     break;
             }
 
+            this.light = light;
+            this.hit = hit;
             this.columnType = type;
             this.receptorSpritePath = receptorSpritePath;
             this.renderedSprite = receptorSprite;
             this.rotation = rotation;
             this.layer = layer;
-            this.receptorSprite = receptor;
             this.position = position;
 
         }
 
-        public void MoveReceptor(double starttime, Vector2 newPosition, OsbEasing ease, double duration)
+        // Absolute Movements overwrite any and all relative movements that might have existed before them hence why they are absolute!
+        public void MoveReceptorAbsolute(double starttime, Vector2 endPos)
         {
-            OsbSprite receptor = this.receptorSprite;
 
-            double endtime = starttime + duration;
+            AddXValue(starttime, endPos.X, true);
+            AddYValue(starttime, endPos.Y, true);
 
-            Vector2 lastPosition = getCurrentPosition(starttime);
-
-            if (duration == 0)
-            {
-                if (lastPosition.X != newPosition.X)
-                    receptor.MoveX(starttime, newPosition.X);
-                if (lastPosition.Y != newPosition.Y)
-                    receptor.MoveY(starttime, newPosition.Y);
-            }
-            else
-            {
-                if (lastPosition.X != newPosition.X)
-                    receptor.MoveX(ease, starttime, starttime + duration, lastPosition.X, newPosition.X);
-                if (lastPosition.Y != newPosition.Y)
-                    receptor.MoveY(ease, starttime, starttime + duration, lastPosition.Y, newPosition.Y);
-            }
 
         }
 
-        public void MoveReceptorEndTime(double starttime, Vector2 newPosition, OsbEasing ease, double endtime)
+        // Absolute Movements overwrite any and all relative movements that might have existed before them hence why they are absolute!
+        public void MoveReceptorAbsolute(OsbEasing ease, double starttime, double endtime, Vector2 startPos, Vector2 endPos)
         {
-            OsbSprite receptor = this.receptorSprite;
-
-            Vector2 lastPosition = getCurrentPosition(starttime);
 
             if (starttime == endtime)
             {
-                if (lastPosition.X != newPosition.X)
-                    receptor.MoveX(starttime, newPosition.X);
-                if (lastPosition.Y != newPosition.Y)
-                    receptor.MoveY(starttime, newPosition.Y);
+                AddXValue(starttime, endPos.X, true);
+                AddYValue(starttime, endPos.Y, true);
+                return;
             }
-            else
-            {
-                if (lastPosition.X != newPosition.X)
-                    receptor.MoveX(ease, starttime, endtime - starttime, lastPosition.X, newPosition.X);
-                if (lastPosition.Y != newPosition.Y)
-                    receptor.MoveY(ease, starttime, endtime - starttime, lastPosition.Y, newPosition.Y);
-            }
+
+            easeProgressAbsolute(ease, starttime, endtime, startPos, endPos);
 
         }
 
-        public void MoveReceptorRelative(double starttime, Vector2 offset, OsbEasing ease, double duration)
+        public void MoveReceptorRelative(OsbEasing ease, double starttime, double endtime, Vector2 offset)
         {
-            OsbSprite receptor = this.receptorSprite;
 
-            Vector2 lastPosition = getCurrentPosition(starttime);
-            Vector2 newPosition = Vector2.Add(lastPosition, offset);
+            if (starttime == endtime)
+            {
+                AddXValue(starttime, offset.X);
+                AddYValue(starttime, offset.Y);
+                return;
+            }
 
-            if (duration == 0)
-            {
-                if (lastPosition.X != newPosition.X)
-                    receptor.MoveX(starttime, newPosition.X);
-                if (lastPosition.Y != newPosition.Y)
-                    receptor.MoveY(starttime, newPosition.Y);
-            }
-            else
-            {
-                if (lastPosition.X != newPosition.X)
-                    receptor.MoveX(ease, starttime, starttime + duration, lastPosition.X, newPosition.X);
-                if (lastPosition.Y != newPosition.Y)
-                    receptor.MoveY(ease, starttime, starttime + duration, lastPosition.Y, newPosition.Y);
-            }
+            easeProgressRelative(ease, starttime, endtime, offset);
 
         }
 
-        public void MoveReceptorRelativeX(double starttime, double duration, OsbEasing ease, double value)
+        public void MoveReceptorRelative(OsbEasing ease, double starttime, double endtime, Vector2 offset, Vector2 absolute)
         {
-            OsbSprite receptor = this.receptorSprite;
 
-            Vector2 originalPostion = receptor.PositionAt(starttime);
-
-            if (duration == 0)
+            if (starttime == endtime)
             {
-                receptor.MoveX(starttime, (float)originalPostion.X + value);
-            }
-            else
-            {
-                receptor.MoveX(ease, starttime, starttime + duration, originalPostion.X, originalPostion.X + value);
+                AddXValue(starttime, offset.X);
+                AddYValue(starttime, offset.Y);
+                return;
             }
 
+            easeProgressRelative(ease, starttime, endtime, offset);
 
         }
 
-        public void MoveReceptorRelativeY(double starttime, double value, OsbEasing ease, double duration)
+        public void MoveReceptorRelativeX(OsbEasing ease, double starttime, double endtime, float value)
         {
-            OsbSprite receptor = this.receptorSprite;
 
-            Vector2 originalPostion = receptor.PositionAt(starttime);
+            if (starttime == endtime)
+            {
+                AddXValue(starttime, value);
+                return;
+            }
 
-            if (duration == 0)
-            {
-                receptor.MoveY(starttime, originalPostion.Y + value);
-            }
-            else
-            {
-                receptor.MoveY(ease, starttime, starttime + duration, originalPostion.Y, originalPostion.Y + value);
-            }
+            easeProgressRelative(ease, starttime, endtime, new Vector2(value, 0));
 
         }
 
-        public void ScaleReceptor(double starttime, Vector2 newScale, OsbEasing ease, double duration)
+        public void MoveReceptorRelativeY(OsbEasing ease, double starttime, double endtime, float value)
         {
-            OsbSprite receptor = this.receptorSprite;
+            if (starttime == endtime)
+            {
+                AddYValue(starttime, value);
+                return;
+            }
 
-            Vector2 originalScale = getCurrentScale(starttime);
+            easeProgressRelative(ease, starttime, endtime, new Vector2(0, value));
 
-            if (duration == 0)
+        }
+
+        public void ScaleReceptor(OsbEasing ease, double starttime, double endtime, Vector2 newScale)
+        {
+            OsbSprite receptor = this.renderedSprite;
+
+            Vector2 originalScale = ScaleAt(starttime);
+
+            if (starttime == endtime)
             {
                 receptor.ScaleVec(starttime, newScale);
+                light.ScaleVec(starttime, newScale * 2f);
+                hit.ScaleVec(starttime, newScale * 2f);
             }
             else
             {
-                receptor.ScaleVec(ease, starttime, starttime + duration, originalScale, newScale);
+                receptor.ScaleVec(ease, starttime, endtime, originalScale, newScale);
+                light.ScaleVec(ease, starttime, endtime, originalScale * 2f, newScale * 2f);
+                hit.ScaleVec(ease, starttime, endtime, originalScale * 2f, newScale * 2f);
             }
         }
 
-        public void RotateReceptorAbsolute(double starttime, double duration, OsbEasing ease, double rotation)
+        public void RotateReceptorAbsolute(OsbEasing ease, double starttime, double endtime, double rotation)
         {
-            OsbSprite receptor = this.receptorSprite;
+            OsbSprite receptor = this.renderedSprite;
 
 
-            if (duration == 0)
+            if (starttime == endtime)
             {
                 receptor.Rotate(starttime, rotation);
+                light.Rotate(starttime, rotation);
+                hit.Rotate(starttime, rotation);
             }
             else
             {
-                receptor.Rotate(ease, starttime, starttime + duration, getCurrentRotaion(starttime), rotation);
+                receptor.Rotate(ease, starttime, endtime, RotationAt(starttime), rotation);
+                light.Rotate(ease, starttime, endtime, RotationAt(starttime), rotation);
+                hit.Rotate(ease, starttime, endtime, RotationAt(starttime), rotation);
             }
 
             this.rotation = rotation;
 
         }
 
-        public void RotateReceptor(double starttime, double duration, OsbEasing ease, double rotation)
+        public void RotateReceptor(OsbEasing ease, double starttime, double endtime, double rotation)
         {
-            OsbSprite receptor = this.receptorSprite;
-            var currentRot = getCurrentRotaion(starttime);
+            OsbSprite receptor = this.renderedSprite;
+            var currentRot = RotationAt(starttime);
             var newRotation = currentRot + rotation;
 
-            if (duration == 0)
+            if (starttime == endtime)
             {
                 receptor.Rotate(starttime, newRotation);
+                light.Rotate(starttime, newRotation);
+                hit.Rotate(starttime, newRotation);
             }
             else
             {
-                receptor.Rotate(ease, starttime, starttime + duration, currentRot, newRotation);
+                receptor.Rotate(ease, starttime, endtime, currentRot, newRotation);
+                light.Rotate(ease, starttime, endtime, currentRot, newRotation);
+                hit.Rotate(ease, starttime, endtime, currentRot, newRotation);
             }
 
             this.rotation = newRotation;
 
         }
 
-        public string PivotReceptor(double starttime, double rotation, OsbEasing ease, double duration, int stepcount, Vector2 center)
+        public void PivotReceptor(OsbEasing ease, double starttime, double endtime, double rotation, Vector2 center)
         {
+            Vector2 point = PositionAt(endtime);
 
-            string dbg = "";
+            double duration = Math.Max(endtime - starttime, 1);
+            double endRadians = rotation; // Total rotation in radians
 
-            stepcount = Math.Max(stepcount, 1);
+            Vector2 currentPosition = point;
+            double currentTime = starttime;
 
-            Vector2 point = receptorSprite.PositionAt(starttime);
-
-            double stepTime = Math.Max(duration / stepcount, 0);
-
-            double endRadians = rotation; // Set the desired end radians here, 2*PI radians is a full circle
-            double rotationPerIteration = endRadians / Math.Max(stepcount, 1); // Rotation per iteration
-
-            for (int i = 1; i <= stepcount; i++)
+            while (currentTime <= endtime)
             {
-                var currentTime = starttime + stepTime * i;
+                double progress = Math.Max(currentTime - starttime, 1) / duration; // Calculate progress as a ratio
 
-                Vector2 rotatedPoint = Utility.PivotPoint(point, center, rotationPerIteration * i);
-                MoveReceptor(currentTime, rotatedPoint, ease, stepTime);
-            }
+                // Adjust the rotation based on progress and easing
+                double easedProgress = ease.Ease(progress); // Assuming ease.Ease() applies the easing to the progress
+                double currentRotation = endRadians * easedProgress; // Total rotation adjusted by eased progress
 
-            return dbg;
-        }
+                Vector2 rotatedPoint = Utility.PivotPoint(point, center, Math.Round(currentRotation, 5));
 
-        public void PivotAndRescaleReceptor(double starttime, double rotation, OsbEasing ease, double duration, int stepcount, Vector2 center, double targetDistance)
-        {
-            Vector2 initialPoint = receptorSprite.PositionAt(starttime);
+                Vector2 relativeMovement = rotatedPoint - currentPosition;
+                Vector2 absoluteMovement = rotatedPoint - point;
 
-            double stepTime = duration / stepcount;
-            double rotationPerIteration = rotation / (stepcount - 1);
+                MoveReceptorRelative(ease, currentTime, currentTime, relativeMovement, absoluteMovement);
 
-            // Calculate initial distance
-            double initialDistance = (initialPoint - center).Length;
-
-            for (int i = 0; i < stepcount; i++)
-            {
-                var currentTime = starttime + stepTime * i;
-
-                // Rotate the point
-                Vector2 rotatedPoint = Utility.PivotPoint(initialPoint, center, rotationPerIteration * i);
-
-                // Get the direction in which we're moving (based on rotation around the center).
-                Vector2 directionFromCenter = rotatedPoint - center;
-                directionFromCenter.Normalize(); // Normalize to get a unit vector
-
-                // Interpolate between initialDistance and targetDistance based on the progress
-                double desiredDistance = initialDistance + (targetDistance - initialDistance) * ((double)i / stepcount);
-
-                // Compute the new position based on the desired distance
-                Vector2 newPoint = center + directionFromCenter * (float)desiredDistance;
-
-                MoveReceptor(currentTime, newPoint, ease, stepTime);
+                currentPosition = rotatedPoint;
+                currentTime += deltaIncrement;
             }
         }
 
 
-
-        public Vector2 getCurrentScale(double currentTime)
+        public Vector2 ScaleAt(double currentTime)
         {
-            CommandScale scale = this.receptorSprite.ScaleAt(currentTime);
-            return new Vector2(scale.X, scale.Y);
+            return renderedSprite.ScaleAt(currentTime);
         }
 
-        public Vector2 getCurrentPosition(double currentTime)
+        public float RotationAt(double currentTIme)
         {
-            Vector2 position = this.receptorSprite.PositionAt(currentTime);
-
-            return position;
-        }
-
-        public Vector2 getCurrentPositionForNotes(double currentTime)
-        {
-            Vector2 position = this.receptorSprite.PositionAt(currentTime);
-            Vector2 currentScale = getCurrentScale(currentTime);
-
-            return position;
-        }
-
-        public float getCurrentRotaion(double currentTIme)
-        {
-            return this.receptorSprite.RotationAt(currentTIme);
+            return this.renderedSprite.RotationAt(currentTIme);
         }
 
         public void Render(double starttime, double endtime)
@@ -402,8 +369,6 @@ namespace StorybrewScripts
                 adjustedTime += beatDuration;
             }
 
-            sprite.ScaleVec(starttime, receptorSprite.ScaleAt(starttime));
-
         }
 
         public void RenderTransformed(double starttime, double endtime, string reference)
@@ -417,44 +382,16 @@ namespace StorybrewScripts
             OsbSprite oldSprite = this.renderedSprite;
             this.appliedTransformation = reference;
             oldSprite.Fade(starttime, 0);
-            OsbSprite sprite = layer.CreateSprite(Path.Combine("sb", "transformation", reference, this.columnType.ToString(), "receptor", "receptor" + ".png"), OsbOrigin.Centre, receptorSprite.PositionAt(starttime));
+            OsbSprite sprite = layer.CreateSprite(Path.Combine("sb", "transformation", reference, this.columnType.ToString(), "receptor", "receptor" + ".png"), OsbOrigin.Centre, PositionAt(starttime));
 
             sprite.Rotate(starttime, 0);
-            sprite.ScaleVec(starttime, receptorSprite.ScaleAt(starttime));
+            sprite.ScaleVec(starttime, renderedSprite.ScaleAt(starttime));
             sprite.Fade(starttime, 1);
             sprite.Fade(endtime, 0);
 
             this.renderedSprite = sprite;
 
             // oldSprite = null;
-        }
-
-        public void addOperation(Operation operation)
-        {
-
-            operationLog.Add(operation);
-            operationLog.Sort((a, b) => a.starttime.CompareTo(b.starttime));
-
-        }
-
-        public List<Operation> executeOperations()
-        {
-            List<Operation> brokenUpOperations = Operation.ResolveOverlaps(operationLog);
-
-            brokenUpOperations.ForEach(op =>
-            {
-                switch (op.type)
-                {
-                    case OperationType.MOVE:
-                        receptorSprite.Move(op.easing, op.starttime, op.endtime, receptorSprite.PositionAt(op.starttime - 1), (CommandPosition)op.value);
-                        break;
-                    case OperationType.MOVERELATIVE:
-                        receptorSprite.Move(op.easing, op.starttime, op.endtime, receptorSprite.PositionAt(op.starttime), Vector2.Add(receptorSprite.PositionAt(op.starttime), (CommandPosition)op.value));
-                        break;
-                }
-            });
-
-            return brokenUpOperations;
         }
 
         public Color4 LerpColor(Color4 colorA, Color4 colorB, double t)
@@ -465,6 +402,199 @@ namespace StorybrewScripts
             byte a = (byte)(colorA.A + t * (colorB.A - colorA.A));
 
             return new Color4(r, g, b, a);
+        }
+
+        private void AddXValue(double time, float value, bool absolute = false)
+        {
+
+            lock (lockX)
+            {
+                if (positionX == null)
+                {
+                    positionX = new SortedDictionary<double, float>();
+                }
+
+                // Update or add the value at the specified time
+                if (positionX.ContainsKey(time))
+                {
+                    if (absolute)
+                        positionX[time] = value;
+                    else
+                        positionX[time] += value;
+                }
+                else
+                {
+                    float lastValue = getLastX(time);
+                    positionX.Add(time, lastValue + value);
+                }
+
+                // Adjust all subsequent values
+                Parallel.ForEach(positionX.Keys.Where(k => k > time).ToList(), key =>
+                {
+                    {
+                        positionX[key] += value;
+                    }
+                });
+            }
+        }
+
+
+        private void AddYValue(double time, float value, bool absolute = false)
+        {
+            lock (lockY)
+            {
+                if (positionY == null)
+                {
+                    positionY = new SortedDictionary<double, float>();
+                }
+
+                // Update or add the value at the specified time
+                if (positionY.ContainsKey(time))
+                {
+                    if (absolute)
+                        positionY[time] = value;
+                    else
+                        positionY[time] += value;
+                }
+                else
+                {
+                    float lastValue = getLastY(time);
+                    positionY.Add(time, lastValue + value);
+                }
+
+                // Adjust all subsequent values
+                Parallel.ForEach(positionY.Keys.Where(k => k > time).ToList(), key =>
+                {
+                    positionY[key] += value;
+                });
+            }
+        }
+
+        private float getLastX(double currentTime)
+        {
+            if (positionX == null || positionX.Count == 0)
+            {
+                return 0; // Or your default value
+            }
+
+            var keys = positionX.Keys.ToList();
+            int left = 0;
+            int right = keys.Count - 1;
+            double lastKey = -1;
+
+            while (left <= right)
+            {
+                int mid = left + (right - left) / 2;
+                if (keys[mid] < currentTime)
+                {
+                    lastKey = keys[mid];
+                    left = mid + 1;
+                }
+                else
+                {
+                    right = mid - 1;
+                }
+            }
+
+            return lastKey != -1 ? positionX[lastKey] : 0;
+        }
+
+
+        private float getLastY(double currentTime)
+        {
+            if (positionY == null || positionY.Count == 0)
+            {
+                return 0; // Or your default value
+            }
+
+            var keys = positionY.Keys.ToList();
+            int left = 0;
+            int right = keys.Count - 1;
+            double lastKey = -1;
+
+            while (left <= right)
+            {
+                int mid = left + (right - left) / 2;
+                if (keys[mid] < currentTime)
+                {
+                    lastKey = keys[mid];
+                    left = mid + 1;
+                }
+                else
+                {
+                    right = mid - 1;
+                }
+            }
+
+            return lastKey != -1 ? positionY[lastKey] : 0;
+        }
+
+        private void easeProgressAbsolute(OsbEasing ease, double start, double end, Vector2 startPos, Vector2 endPos)
+        {
+
+            double duration = Math.Max(end - start, 0); // Ensure non-negative duration
+            double deltaTime = 0;
+            Vector2 lastPos = startPos; // Keep track of the last position to calculate the delta
+
+            double progress = 0;
+            do
+            {
+                deltaTime += deltaIncrement; // Increment time by deltaIncrement
+                progress = deltaTime / duration; // Normalized time [0, 1]
+                progress = Math.Min(progress, 1);       // Clamp progress to 1 to avoid overshooting
+
+                float t = (float)ease.Ease(progress);   // Apply easing function
+
+                Vector2 newPos = Vector2.Lerp(startPos, endPos, t); // Interpolated position
+                Vector2 movement = newPos - lastPos;               // Delta movement
+
+                // Apply the delta movement
+                AddXValue(start + deltaTime, movement.X, true);
+                AddYValue(start + deltaTime, movement.Y, true);
+
+
+                lastPos = newPos;   // Update lastPos for the next iteration
+            } while (progress < 1);
+
+        }
+
+        private void easeProgressRelative(OsbEasing ease, double start, double end, Vector2 offset)
+        {
+            Vector2 startPos = new Vector2(0, 0); // Assuming starting at origin; replace with actual start if different
+            Vector2 endPos = startPos + offset;   // The final desired position
+
+            double duration = Math.Max(end - start + 1, 0); // Ensure non-negative duration
+            double deltaTime = 0;
+            Vector2 lastPos = startPos; // Keep track of the last position to calculate the delta
+
+            double progress = 0;
+            do
+            {
+                deltaTime += deltaIncrement; // Increment time by deltaIncrement
+                progress = deltaTime / duration; // Normalized time [0, 1]
+                progress = Math.Min(progress, 1);       // Clamp progress to 1 to avoid overshooting
+
+                float t = (float)ease.Ease(progress);   // Apply easing function
+
+                Vector2 newPos = Vector2.Lerp(startPos, endPos, t); // Interpolated position
+                Vector2 movement = newPos - lastPos;               // Delta movement
+
+                // Apply the delta movement
+                if (offset.X != 0)
+                    AddXValue(start + deltaTime, movement.X);
+                if (offset.Y != 0)
+                    AddYValue(start + deltaTime, movement.Y);
+
+
+                lastPos = newPos;   // Update lastPos for the next iteration
+            } while (progress < 1);
+
+        }
+
+
+        public Vector2 PositionAt(double time)
+        {
+            return new Vector2(getLastX(time), getLastY(time));
         }
 
 

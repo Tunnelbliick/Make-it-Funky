@@ -15,20 +15,21 @@ namespace StorybrewScripts
 {
     public class SecondDrop : StoryboardObjectGenerator
     {
+
         public override void Generate()
         {
             var receptors = GetLayer("r");
             var notes = GetLayer("n");
 
             // General values
-            var starttime = 106462;
-            var renderStart = 106565;
+            var starttime = 106565;
+            var renderStart = 106668;
             var endtime = 121873;
             var duration = endtime - renderStart;
 
             // Playfield Scale
             var width = 250f;
-            var height = -550f;
+            var height = 500f;
 
             // Note initilization Values
             var bpm = 146f;
@@ -38,6 +39,18 @@ namespace StorybrewScripts
             // Drawinstance Values
             var updatesPerSecond = 30;
             var scrollSpeed = 900f;
+
+            if (Beatmap.Name == "HARD MODE")
+            {
+                scrollSpeed = 750f;
+            }
+
+            if (Beatmap.Name == "EASY MODE")
+            {
+                scrollSpeed = 1050f;
+            }
+
+
             var fadeTime = 50;
 
             var recepotrBitmap = GetMapsetBitmap("sb/sprites/receiver.png"); // The receptor sprite
@@ -48,8 +61,8 @@ namespace StorybrewScripts
                 using (Playfield field = new Playfield())
                 {
 
-                    field.initilizePlayField(receptors, notes, starttime, endtime, receportWidth, 60, 0);
-                    field.initializeNotes(Beatmap.HitObjects.ToList(), notes, bpm, offset, false, sliderAccuracy);
+                    field.initilizePlayField(receptors, notes, starttime, endtime, width, height, 50, Beatmap.OverallDifficulty);
+                    field.initializeNotes(Beatmap.HitObjects.ToList(), bpm, offset, false, sliderAccuracy);
 
                     field.noteStart = 106565 - 1000;
 
@@ -58,8 +71,8 @@ namespace StorybrewScripts
                         field.noteEnd = 117764;
                     }
 
-                    field.ScalePlayField(starttime, 0, OsbEasing.None, width, height);
-                    field.ZoomAndMove(starttime + 1, 0, OsbEasing.OutCirc, new Vector2(0.45f, 0.45f), new Vector2(0, -24.5f));
+                    //field.ScalePlayField(starttime, 0, OsbEasing.None, width, height);
+                    //field.ZoomAndMove(starttime + 1, 0, OsbEasing.OutCirc, new Vector2(0.45f, 0.45f), new Vector2(0, -24.5f));
 
                     if (i == 1)
                     {
@@ -84,7 +97,7 @@ namespace StorybrewScripts
                                 // For the 108312, 108723, and 109134 timestamps, we move all columns by the same value
                                 if (timestamp >= 108312)
                                 {
-                                    field.MoveColumnRelative(timestamp, 200, OsbEasing.OutCirc, new Vector2(moveValue, 0), columns[j]);
+                                    field.MoveColumnRelative(OsbEasing.OutCirc, timestamp, timestamp + 200, new Vector2(moveValue, 0), columns[j]);
                                     continue;
                                 }
 
@@ -93,7 +106,7 @@ namespace StorybrewScripts
                                 if (timestamp == 107490 && columns[j] == ColumnType.two) moveValue = 187.5f;
                                 if (timestamp == 107901 && columns[j] == ColumnType.one) moveValue = 250f;
 
-                                field.MoveColumnRelative(timestamp, 200, OsbEasing.OutCirc, new Vector2(moveValue, 0), columns[j]);
+                                field.MoveColumnRelative(OsbEasing.OutCirc, timestamp, timestamp + 200, new Vector2(moveValue, 0), columns[j]);
                             }
                         }
                     }
@@ -122,7 +135,7 @@ namespace StorybrewScripts
                                 if (timestamp == 109134 && columns[j] == ColumnType.two) moveValue = 250f;
                                 if (timestamp == 109134 && columns[j] == ColumnType.one) moveValue = 250f;
 
-                                field.MoveColumnRelative(timestamp, 200, OsbEasing.OutCirc, new Vector2(moveValue, 0), columns[j]);
+                                field.MoveColumnRelative(OsbEasing.OutCirc, timestamp, timestamp + 200, new Vector2(moveValue, 0), columns[j]);
                             }
                         }
                     }
@@ -150,7 +163,7 @@ namespace StorybrewScripts
                                 // For the 108312, 108723, and 109134 timestamps, we move all columns by the same value
                                 if (timestamp >= 108312)
                                 {
-                                    field.MoveColumnRelative(timestamp, 200, OsbEasing.OutCirc, new Vector2(moveValue, 0), columns[j]);
+                                    field.MoveColumnRelative(OsbEasing.OutCirc, timestamp, timestamp + 200, new Vector2(moveValue, 0), columns[j]);
                                     continue;
                                 }
 
@@ -159,7 +172,7 @@ namespace StorybrewScripts
                                 if (timestamp == 107490 && columns[j] == ColumnType.three) moveValue = -187.5f;
                                 if (timestamp == 107901 && columns[j] == ColumnType.four) moveValue = -250f;
 
-                                field.MoveColumnRelative(timestamp, 200, OsbEasing.OutCirc, new Vector2(moveValue, 0), columns[j]);
+                                field.MoveColumnRelative(OsbEasing.OutCirc, timestamp, timestamp + 200, new Vector2(moveValue, 0), columns[j]);
                             }
                         }
                     }
@@ -188,7 +201,7 @@ namespace StorybrewScripts
                                 if (timestamp == 109134 && columns[j] == ColumnType.three) moveValue = -250f;
                                 if (timestamp == 109134 && columns[j] == ColumnType.four) moveValue = -250f;
 
-                                field.MoveColumnRelative(timestamp, 200, OsbEasing.OutCirc, new Vector2(moveValue, 0), columns[j]);
+                                field.MoveColumnRelative(OsbEasing.OutCirc, timestamp, timestamp + 200, new Vector2(moveValue, 0), columns[j]);
                             }
                         }
                     }
@@ -216,7 +229,7 @@ namespace StorybrewScripts
                                 // For the 108312, 108723, and 109134 timestamps, we move all columns by the same value
                                 if (timestamp >= 108312)
                                 {
-                                    field.MoveColumnRelative(timestamp, 200, OsbEasing.OutCirc, new Vector2(moveValue, 0), columns[j]);
+                                    field.MoveColumnRelative(OsbEasing.OutCirc, timestamp, timestamp + 200, new Vector2(moveValue, 0), columns[j]);
                                     continue;
                                 }
 
@@ -224,7 +237,7 @@ namespace StorybrewScripts
                                 if (timestamp == 107079 && columns[j] == ColumnType.two) moveValue = -125;
                                 if (timestamp == 107490 && columns[j] == ColumnType.three) moveValue = -187.5f;
                                 if (timestamp == 107901 && columns[j] == ColumnType.four) moveValue = -250f;
-                                field.MoveColumnRelative(timestamp, 200, OsbEasing.OutCirc, new Vector2(moveValue, 0), columns[j]);
+                                field.MoveColumnRelative(OsbEasing.OutCirc, timestamp, timestamp + 200, new Vector2(moveValue, 0), columns[j]);
                             }
                         }
                     }
@@ -253,19 +266,20 @@ namespace StorybrewScripts
                             break;
                     }
 
+
                     flipColumn(field, 109545, 400, OsbEasing.OutCirc, ColumnType.all);
 
                     double currentTime = 109956;
                     double snapDuration = 44613 - 44202;
                     for (int n = 0; n <= 6; n++)
                     {
-                        field.moveFieldX(currentTime, snapDuration, OsbEasing.OutCirc, 250 / 4);
+                        field.moveFieldX(OsbEasing.OutCirc, currentTime, currentTime + snapDuration, 250 / 4);
 
                         if (didHop)
                         {
-                            field.moveField(currentTime, 0, OsbEasing.OutCirc, 0, -15);
-                            field.moveField(currentTime + snapDuration / 2, snapDuration / 2, OsbEasing.InSine, 0, 15);
-                            field.RotatePlayFieldStatic(currentTime, snapDuration / 2, OsbEasing.OutSine, Math.PI);
+                            field.moveFieldY(OsbEasing.OutCirc, currentTime, currentTime, -15);
+                            field.moveFieldY(OsbEasing.InSine, currentTime + snapDuration / 2, currentTime + snapDuration, 15);
+                            field.RotatePlayFieldStatic(OsbEasing.OutSine, currentTime, currentTime + snapDuration / 2, Math.PI);
                         }
 
                         didHop = !didHop;
@@ -275,7 +289,7 @@ namespace StorybrewScripts
 
                     if (didHop)
                     {
-                        field.RotatePlayFieldStatic(currentTime, 0, OsbEasing.OutSine, Math.PI);
+                        field.RotatePlayFieldStatic(OsbEasing.OutSine, currentTime, currentTime, Math.PI);
                     }
 
                     flipColumn(field, 112832, 400, OsbEasing.OutCirc, ColumnType.all);
@@ -285,13 +299,13 @@ namespace StorybrewScripts
                     snapDuration = 44613 - 44202;
                     for (int n = 0; n <= 6; n++)
                     {
-                        field.moveFieldX(currentTime, snapDuration, OsbEasing.OutCirc, -250 / 4);
+                        field.moveFieldX(OsbEasing.OutCirc, currentTime, currentTime + snapDuration, -250 / 4);
 
                         if (didHop)
                         {
-                            field.moveField(currentTime, 0, OsbEasing.OutCirc, 0, 15);
-                            field.moveField(currentTime + snapDuration / 2, snapDuration / 2, OsbEasing.InSine, 0, -15);
-                            field.RotatePlayFieldStatic(currentTime + 1, snapDuration / 2, OsbEasing.OutSine, -3.1415);
+                            field.moveFieldY(OsbEasing.OutCirc, currentTime, 0, 15);
+                            field.moveFieldY(OsbEasing.InSine, currentTime + snapDuration / 2, currentTime + snapDuration, -15);
+                            field.RotatePlayFieldStatic(OsbEasing.OutSine, currentTime, currentTime + snapDuration / 2, -Math.PI);
                         }
 
                         didHop = !didHop;
@@ -300,147 +314,210 @@ namespace StorybrewScripts
 
                     if (didHop)
                     {
-                        field.columns.Values.ToList().ForEach((col) => Log($"{i} - {col.type} - {col.getReceptorRotation(currentTime)}"));
-                        field.RotatePlayFieldStatic(currentTime + 100, 100, OsbEasing.None, -Math.PI);
+                        //field.columns.Values.ToList().ForEach((col) => Log($"{i} - {col.type} - {col.getReceptorRotation(currentTime)}"));
+                        field.RotatePlayFieldStatic(OsbEasing.None, currentTime + 100, currentTime + 200, -Math.PI);
                     }
 
 
                     if (i == 1)
                     {
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.one);
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.two);
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.three);
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(-62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(-62.5f * 1, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(-62.5f * 1, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(-62.5f * 1, 0), ColumnType.four);
 
-                        field.MoveColumnRelative(116325, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.one);
-                        field.MoveColumnRelative(116325, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.two);
-                        field.MoveColumnRelative(116325, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.three);
-                        field.MoveColumnRelative(116325, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116325, 116325 + 150, new Vector2(-62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116325, 116325 + 150, new Vector2(-62.5f * 1, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116325, 116325 + 150, new Vector2(-62.5f * 1, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116325, 116325 + 150, new Vector2(-62.5f * 1, 0), ColumnType.four);
 
-                        field.MoveColumnRelative(116531, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.one);
-                        field.MoveColumnRelative(116531, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.two);
-                        field.MoveColumnRelative(116531, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.three);
-                        field.MoveColumnRelative(116531, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116531, 116531 + 150, new Vector2(-62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116531, 116531 + 150, new Vector2(-62.5f * 1, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116531, 116531 + 150, new Vector2(-62.5f * 1, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116531, 116531 + 150, new Vector2(-62.5f * 1, 0), ColumnType.four);
 
-                        field.MoveColumnRelative(116736, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.one);
-                        field.MoveColumnRelative(116736, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.two);
-                        field.MoveColumnRelative(116736, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.three);
-                        field.MoveColumnRelative(116736, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116736, 116736 + 150, new Vector2(-62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116736, 116736 + 150, new Vector2(-62.5f * 1, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116736, 116736 + 150, new Vector2(-62.5f * 1, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116736, 116736 + 150, new Vector2(-62.5f * 1, 0), ColumnType.four);
 
-                        field.MoveColumnRelative(116942, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 4, 0), ColumnType.one);
-                        field.MoveColumnRelative(116942, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.two);
-                        field.MoveColumnRelative(116942, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.three);
-                        field.MoveColumnRelative(116942, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116942, 116942 + 150, new Vector2(-62.5f * 4, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116942, 116942 + 150, new Vector2(-62.5f * 1, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116942, 116942 + 150, new Vector2(-62.5f * 1, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116942, 116942 + 150, new Vector2(-62.5f * 1, 0), ColumnType.four);
 
-                        field.MoveColumnRelative(117147, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 3, 0), ColumnType.two);
-                        field.MoveColumnRelative(117147, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.three);
-                        field.MoveColumnRelative(117147, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117147, 117147 + 150, new Vector2(-62.5f * 3, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117147, 117147 + 150, new Vector2(-62.5f * 1, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117147, 117147 + 150, new Vector2(-62.5f * 1, 0), ColumnType.four);
 
-                        field.MoveColumnRelative(117353, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 2, 0), ColumnType.three);
-                        field.MoveColumnRelative(117353, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117353, 117353 + 150, new Vector2(-62.5f * 2, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117353, 117353 + 150, new Vector2(-62.5f * 1, 0), ColumnType.four);
 
-                        field.MoveColumnRelative(117558, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117558, 117558 + 150, new Vector2(-62.5f * 1, 0), ColumnType.four);
                     }
 
                     if (i == 2)
                     {
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.four);
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.three);
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.two);
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(62.5f * 1, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(62.5f * 1, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(62.5f * 1, 0), ColumnType.one);
 
-                        field.MoveColumnRelative(116325, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.four);
-                        field.MoveColumnRelative(116325, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.three);
-                        field.MoveColumnRelative(116325, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.two);
-                        field.MoveColumnRelative(116325, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116325, 116325 + 150, new Vector2(62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116325, 116325 + 150, new Vector2(62.5f * 1, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116325, 116325 + 150, new Vector2(62.5f * 1, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116325, 116325 + 150, new Vector2(62.5f * 1, 0), ColumnType.one);
 
-                        field.MoveColumnRelative(116531, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.four);
-                        field.MoveColumnRelative(116531, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.three);
-                        field.MoveColumnRelative(116531, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.two);
-                        field.MoveColumnRelative(116531, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116531, 116531 + 150, new Vector2(62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116531, 116531 + 150, new Vector2(62.5f * 1, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116531, 116531 + 150, new Vector2(62.5f * 1, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116531, 116531 + 150, new Vector2(62.5f * 1, 0), ColumnType.one);
 
-                        field.MoveColumnRelative(116736, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.four);
-                        field.MoveColumnRelative(116736, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.three);
-                        field.MoveColumnRelative(116736, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.two);
-                        field.MoveColumnRelative(116736, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116736, 116736 + 150, new Vector2(62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116736, 116736 + 150, new Vector2(62.5f * 1, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116736, 116736 + 150, new Vector2(62.5f * 1, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116736, 116736 + 150, new Vector2(62.5f * 1, 0), ColumnType.one);
 
-                        field.MoveColumnRelative(116942, 150, OsbEasing.OutCirc, new Vector2(62.5f * 4, 0), ColumnType.four);
-                        field.MoveColumnRelative(116942, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.three);
-                        field.MoveColumnRelative(116942, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.two);
-                        field.MoveColumnRelative(116942, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116942, 116942 + 150, new Vector2(62.5f * 4, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116942, 116942 + 150, new Vector2(62.5f * 1, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116942, 116942 + 150, new Vector2(62.5f * 1, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116942, 116942 + 150, new Vector2(62.5f * 1, 0), ColumnType.one);
 
-                        field.MoveColumnRelative(117147, 150, OsbEasing.OutCirc, new Vector2(62.5f * 3, 0), ColumnType.three);
-                        field.MoveColumnRelative(117147, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.two);
-                        field.MoveColumnRelative(117147, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117147, 117147 + 150, new Vector2(62.5f * 3, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117147, 117147 + 150, new Vector2(62.5f * 1, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117147, 117147 + 150, new Vector2(62.5f * 1, 0), ColumnType.one);
 
-                        field.MoveColumnRelative(117353, 150, OsbEasing.OutCirc, new Vector2(62.5f * 2, 0), ColumnType.two);
-                        field.MoveColumnRelative(117353, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117353, 117353 + 150, new Vector2(62.5f * 2, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117353, 117353 + 150, new Vector2(62.5f * 1, 0), ColumnType.one);
 
-                        field.MoveColumnRelative(117558, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117558, 117558 + 150, new Vector2(62.5f * 1, 0), ColumnType.one);
                     }
 
                     if (i == 3)
                     {
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 4, 0), ColumnType.one);
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.two);
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.three);
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(-62.5f * 4, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(-62.5f * 1, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(-62.5f * 1, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(-62.5f * 1, 0), ColumnType.four);
 
-                        field.MoveColumnRelative(116325, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 3, 0), ColumnType.two);
-                        field.MoveColumnRelative(116325, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.three);
-                        field.MoveColumnRelative(116325, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116325, 116325 + 150, new Vector2(-62.5f * 3, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116325, 116325 + 150, new Vector2(-62.5f * 1, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116325, 116325 + 150, new Vector2(-62.5f * 1, 0), ColumnType.four);
 
-                        field.MoveColumnRelative(116531, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 2, 0), ColumnType.three);
-                        field.MoveColumnRelative(116531, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116531, 116531 + 150, new Vector2(-62.5f * 2, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116531, 116531 + 150, new Vector2(-62.5f * 1, 0), ColumnType.four);
 
-                        field.MoveColumnRelative(116736, 150, OsbEasing.OutCirc, new Vector2(-62.5f * 1, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116736, 116736 + 150, new Vector2(-62.5f * 1, 0), ColumnType.four);
                     }
 
                     if (i == 4)
                     {
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(62.5f * 4, 0), ColumnType.four);
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.three);
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.two);
-                        field.MoveColumnRelative(116120, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(62.5f * 4, 0), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(62.5f * 1, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(62.5f * 1, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116120, 116120 + 150, new Vector2(62.5f * 1, 0), ColumnType.one);
 
-                        field.MoveColumnRelative(116325, 150, OsbEasing.OutCirc, new Vector2(62.5f * 3, 0), ColumnType.three);
-                        field.MoveColumnRelative(116325, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.two);
-                        field.MoveColumnRelative(116325, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116325, 116325 + 150, new Vector2(62.5f * 3, 0), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116325, 116325 + 150, new Vector2(62.5f * 1, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116325, 116325 + 150, new Vector2(62.5f * 1, 0), ColumnType.one);
 
-                        field.MoveColumnRelative(116531, 150, OsbEasing.OutCirc, new Vector2(62.5f * 2, 0), ColumnType.two);
-                        field.MoveColumnRelative(116531, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116531, 116531 + 150, new Vector2(62.5f * 2, 0), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116531, 116531 + 150, new Vector2(62.5f * 1, 0), ColumnType.one);
 
-                        field.MoveColumnRelative(116736, 150, OsbEasing.OutCirc, new Vector2(62.5f * 1, 0), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 116736, 116736 + 150, new Vector2(62.5f * 1, 0), ColumnType.one);
                     }
 
-                    if (i == 0)
+                    if (Beatmap.Name == "EVENT MODE")
                     {
-                        field.MoveColumnRelative(117764, 50, OsbEasing.OutCirc, new Vector2(0, 25), ColumnType.four);
-                        field.MoveColumnRelative(117764 + 50, 50, OsbEasing.InCirc, new Vector2(0, -25), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117764, 117764 + 50, new Vector2(0, 25), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 117764 + 50, 117764 + 100, new Vector2(0, -25), ColumnType.four);
 
-                        field.MoveColumnRelative(117867, 50, OsbEasing.OutCirc, new Vector2(0, 25), ColumnType.two);
-                        field.MoveColumnRelative(117867 + 50, 50, OsbEasing.InCirc, new Vector2(0, -25), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117867, 117867 + 50, new Vector2(0, 25), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 117867 + 50, 117867 + 100, new Vector2(0, -25), ColumnType.two);
 
-                        field.MoveColumnRelative(117918, 50, OsbEasing.OutCirc, new Vector2(0, 25), ColumnType.four);
-                        field.MoveColumnRelative(117918 + 50, 50, OsbEasing.InCirc, new Vector2(0, -25), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117918, 117918 + 50, new Vector2(0, 25), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 117918 + 50, 117918 + 100, new Vector2(0, -25), ColumnType.four);
 
-                        field.MoveColumnRelative(117969, 100, OsbEasing.OutCirc, new Vector2(0, 25), ColumnType.two);
-                        field.MoveColumnRelative(117969 + 100, 100, OsbEasing.InCirc, new Vector2(0, -25), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117969, 117969 + 100, new Vector2(0, 25), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 117969 + 100, 117969 + 200, new Vector2(0, -25), ColumnType.two);
 
-                        field.MoveColumnRelative(118072, 100, OsbEasing.OutCirc, new Vector2(0, 25), ColumnType.four);
-                        field.MoveColumnRelative(118072 + 100, 100, OsbEasing.InCirc, new Vector2(0, -25), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118072, 118072 + 100, new Vector2(0, 25), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118072 + 100, 118072 + 200, new Vector2(0, -25), ColumnType.four);
 
-                        field.MoveColumnRelative(118175, 100, OsbEasing.OutCirc, new Vector2(0, 25), ColumnType.two);
-                        field.MoveColumnRelative(118175 + 100, 100, OsbEasing.InCirc, new Vector2(0, -25), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118175, 118175 + 100, new Vector2(0, 25), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118175 + 100, 118175 + 200, new Vector2(0, -25), ColumnType.two);
 
-                        field.MoveColumnRelative(118380, 150, OsbEasing.OutCirc, new Vector2(0, 25), ColumnType.three);
-                        field.MoveColumnRelative(118380 + 150, 150, OsbEasing.InCirc, new Vector2(0, -25), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118380, 118380 + 150, new Vector2(0, 25), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118380 + 150, 118380 + 300, new Vector2(0, -25), ColumnType.three);
+                    }
+                    else if (Beatmap.Name == "EASY MODE")
+                    {
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117763, 117866, new Vector2(0, 25), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 117866, 117968, new Vector2(0, -25), ColumnType.one);
+
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117968, 118071, new Vector2(0, 25), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118071, 118174, new Vector2(0, -25), ColumnType.two);
+
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118174, 118277, new Vector2(0, 25), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118277, 118379, new Vector2(0, -25), ColumnType.four);
+
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118379, 118482, new Vector2(0, 25), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118482, 118585, new Vector2(0, -25), ColumnType.four);
+
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118585, 118687, new Vector2(0, 25), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118687, 118790, new Vector2(0, -25), ColumnType.three);
+
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118790, 118893, new Vector2(0, 25), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118893, 118996, new Vector2(0, -25), ColumnType.three);
+                    }
+                    else if (Beatmap.Name == "HARD MODE")
+                    {
+                        var delay = 75;
+                        var lDelay = 150;
+                        var shortJ = 20;
+                        var longJ = 40;
+
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117764, 117764 + delay, new Vector2(0, shortJ), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 117764 + delay, 117764 + delay + delay, new Vector2(0, -shortJ), ColumnType.four);
+
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117832, 117832 + delay, new Vector2(0, shortJ), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 117832 + delay, 117832 + delay + delay, new Vector2(0, -shortJ), ColumnType.three);
+
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117901, 117901 + delay, new Vector2(0, shortJ), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 117901 + delay, 117901 + delay + delay, new Vector2(0, -shortJ), ColumnType.two);
+
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 117969, 117969 + delay, new Vector2(0, shortJ), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 117969 + delay, 117969 + delay + delay, new Vector2(0, -shortJ), ColumnType.one);
+
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118072, 118072 + delay, new Vector2(0, shortJ), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118072 + delay, 118072 + delay + delay, new Vector2(0, -shortJ), ColumnType.two);
+
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118175, 118175 + lDelay, new Vector2(0, longJ), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118175 + lDelay, 118175 + lDelay + lDelay, new Vector2(0, -longJ), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118175, 118175 + lDelay, new Vector2(0, longJ), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118175 + lDelay, 118175 + lDelay + lDelay, new Vector2(0, -longJ), ColumnType.four);
+
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118380, 118380 + lDelay, new Vector2(0, longJ), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118380 + lDelay, 118380 + lDelay + lDelay, new Vector2(0, -longJ), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118380, 118380 + lDelay, new Vector2(0, longJ), ColumnType.four);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118380 + lDelay, 118380 + lDelay + lDelay, new Vector2(0, -longJ), ColumnType.four);
+
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118586, 118586 + lDelay, new Vector2(0, longJ), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118586 + lDelay, 118586 + lDelay + lDelay, new Vector2(0, -longJ), ColumnType.three);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118586, 118586 + lDelay, new Vector2(0, longJ), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118586 + lDelay, 118586 + lDelay + lDelay, new Vector2(0, -longJ), ColumnType.one);
+
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118791, 118791 + lDelay, new Vector2(0, longJ), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118791 + lDelay, 118791 + lDelay + lDelay, new Vector2(0, -longJ), ColumnType.one);
+                        field.MoveColumnRelative(OsbEasing.OutCirc, 118791, 118791 + lDelay, new Vector2(0, longJ), ColumnType.two);
+                        field.MoveColumnRelative(OsbEasing.InCirc, 118791 + lDelay, 118791 + lDelay + lDelay, new Vector2(0, -longJ), ColumnType.two);
                     }
 
-                    field.ZoomAndMove(118997 - 150, 150, OsbEasing.OutCirc, new Vector2(0.8f, 0.8f), new Vector2(0, 350));
 
-                    field.Zoom(118997, 150, OsbEasing.OutCirc, new Vector2(0.8f, 0.0f), true);
-                    field.PlayFieldChangeWidth(118997, 150, OsbEasing.OutCirc, 0);
+                    field.moveFieldY(OsbEasing.OutCirc, 118997 - 150, 118997, 210);
+                    field.Scale(OsbEasing.OutCirc, 118997 - 150, 118997, new Vector2(0.8f, 0.8f));
+                    field.Scale(OsbEasing.OutCirc, 118997, 118997 + 150, new Vector2(0.8f, 0.0f), true);
+                    field.Resize(OsbEasing.OutCirc, 118997, 118997 + 150, 0, height);
 
                     DrawInstance draw = new DrawInstance(field, renderStart, scrollSpeed, updatesPerSecond, OsbEasing.None, false, fadeTime, fadeTime);
                     //draw.changeUpdateRate(53243, 50);
@@ -457,10 +534,11 @@ namespace StorybrewScripts
             }
         }
 
-        public Vector2 NoteFunction(Vector2 position, double currentTime, double t)
+        public Vector2 NoteFunction(EquationParameters parm)
         {
-            float y = position.Y;
-            float x = position.X;
+            float y = parm.position.Y;
+            float x = parm.position
+            .X;
 
             return new Vector2(x, y);
         }
@@ -473,15 +551,16 @@ namespace StorybrewScripts
                 if (currentColumn.type == type || type == ColumnType.all)
                 {
 
-                    Vector2 receptorPos = currentColumn.getReceptorPosition(starttime);
-                    Vector2 originPos = currentColumn.getOriginPosition(starttime);
-                    Vector2 center = new Vector2(receptorPos.X, 240);
+                    Vector2 receptorPos = currentColumn.ReceptorPositionAt(starttime);
+                    Vector2 originPos = currentColumn.OriginPositionAt(starttime);
+                    Vector2 center = new Vector2(427, 240);
 
-                    Vector2 flippedReceptorPos = center + (center - receptorPos);
-                    Vector2 flippedOriginPos = center + (center - originPos);
+                    // Calculate the change needed to flip the positions
+                    Vector2 changeReceptorPos = (center - receptorPos) * 2;
+                    Vector2 changeOriginPos = (center - originPos) * 2;
 
-                    currentColumn.receptor.MoveReceptor(starttime, flippedReceptorPos, easing, duration);
-                    currentColumn.origin.MoveOrigin(starttime, flippedOriginPos, easing, duration);
+                    currentColumn.receptor.MoveReceptorRelativeY(easing, starttime, starttime + duration, changeReceptorPos.Y);
+                    currentColumn.origin.MoveOriginRelativeY(easing, starttime, starttime + duration, changeOriginPos.Y);
                 }
 
             }
